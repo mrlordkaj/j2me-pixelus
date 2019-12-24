@@ -1,0 +1,299 @@
+/*
+ * Copyright (C) 2012 Thinh Pham
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
+import javax.microedition.lcdui.game.Sprite;
+import util.ImageHelper;
+
+/**
+ *
+ * @author Thinh Pham
+ */
+public class Hint {
+    private Image backgroundImage, tileImage;
+    private Sprite tileSprite;
+    private Graphics backgroundGraphic, tileGraphic;
+    private byte[][] cell = new byte[16][16];
+    private int[] cursor = new int[] {1, 1};
+    private byte aimDirection = Play.COMMAND_NONE;
+    private int slidingPositionX, slidingPositionY, slidingDeltaX, slidingDeltaY, slidingTargetX, slidingTargetY;
+    private boolean isSliding = false, isAuto = false, isLoading = true;
+    private byte nextTurn = 0;
+    private Play parent;
+    private String data;
+    private StringBuffer processData;
+    
+    public Hint(String _data, Play _parent) {
+        parent = _parent;
+        data = _data;
+        backgroundImage = Image.createImage(Main.SCREENSIZE_WIDTH, Main.SCREENSIZE_HEIGHT);
+        backgroundGraphic = backgroundImage.getGraphics();
+        backgroundGraphic.drawImage(ImageHelper.loadImage("/images/hintbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
+        tileSprite = new Sprite(ImageHelper.loadImage("/images/tile.png"), 12, 12);
+        reset();
+        tileImage = Image.createImage(12, 12);
+        tileGraphic = tileImage.getGraphics();
+        isLoading = false;
+    }
+    
+    private void reset() {
+        processData = new StringBuffer(data);
+        for(byte i = 0; i < 16; i++) {
+            for(byte j = 0; j < 16; j++) {
+                tileSprite.setFrame(cell[i][j] = parent.defaultData[i][j]);
+                tileSprite.setPosition(j * 12 + 104, i * 12 + 24);
+                tileSprite.paint(backgroundGraphic);
+            }
+        }
+    }
+    
+    public void update() {
+        if(isLoading) return;
+        
+        if(isSliding) {
+            slidingPositionX += slidingDeltaX;
+            slidingPositionY += slidingDeltaY;
+            if(slidingPositionX == slidingTargetX && slidingPositionY == slidingTargetY) finishSliding();
+        } else if(isAuto) {
+            if(--nextTurn <= 0) {
+                if(processData.length() > 0) doTurn();
+                else isAuto = false;
+            }
+        }
+    }
+    
+    public void paint(Graphics g) {
+        if(isLoading) return;
+        
+        g.drawImage(backgroundImage, 0, 0, Graphics.LEFT | Graphics.TOP);
+        if(isSliding) g.drawImage(tileImage, slidingPositionX, slidingPositionY, Graphics.LEFT | Graphics.TOP);
+    }
+    
+    public void pointerPressed(int x, int y) {
+        if (x > 0 && x < 80 && y > 0 && y < 50) {
+            parent.closeHint();
+        }
+        
+        if(isSliding || isAuto) return;
+        
+        if(x > 330 && x < 380 && y > 128 && y < 178) {
+            //nút one move
+            if(processData.length() > 0) doTurn();
+            else reset();
+        } else if(x > 330 && x < 380 && y > 184 && y < 234) {
+            //nút all moves
+            isAuto = true;
+            reset();
+        }
+    }
+    
+    private void doTurn() {
+        short cellIndex = (short)processData.charAt(0);
+        cursor[0] = cellIndex / 16;
+        cursor[1] = cellIndex % 16;
+        if(cell[cursor[0]][cursor[1]] <= 2) pushTile();
+        else removeTile();
+        isSliding = true;
+        processData.deleteCharAt(0);
+    }
+    
+    private void pushTile() {
+        //chuẩn bị hình ảnh slidingTile
+        tileSprite.setPosition(0, 0);
+        tileSprite.setFrame(cell[cursor[0]][cursor[1]] + 3);
+        //tileSprite.paint(slidingTile.getGraphics());
+        tileSprite.paint(tileGraphic);
+        
+        calcDirection();
+        
+        //chuẩn bị thông tin vị trí xuất phát, hướng di chuyển
+        switch(aimDirection) {
+            case Play.COMMAND_UP:
+                slidingPositionX = cursor[1] * 12 + 104;
+                slidingPositionY = 216;
+                slidingDeltaX = 0;
+                slidingDeltaY = -12;
+                break;
+
+            case Play.COMMAND_RIGHT:
+                slidingPositionX = 92;
+                slidingPositionY = cursor[0] * 12 + 24;
+                slidingDeltaX = 12;
+                slidingDeltaY = 0;
+                break;
+
+            case Play.COMMAND_DOWN:
+                slidingPositionX = cursor[1] * 12 + 104;
+                slidingPositionY = 12;
+                slidingDeltaX = 0;
+                slidingDeltaY = 12;
+                break;
+
+            case Play.COMMAND_LEFT:
+                slidingPositionX = 296;
+                slidingPositionY = cursor[0] * 12 + 24;
+                slidingDeltaX = -12;
+                slidingDeltaY = 0;
+                break;
+        }
+        
+        //chuẩn bị thông tin về đích đến
+        slidingTargetX = cursor[1] * 12 + 104;
+        slidingTargetY = cursor[0] * 12 + 24;
+    }
+    
+    private void removeTile() {
+        //cập nhật lại hình ảnh background
+        tileSprite.setPosition(cursor[1] * 12 + 104, cursor[0] * 12 + 24);
+        tileSprite.setFrame(cell[cursor[0]][cursor[1]] - 3);
+        tileSprite.paint(backgroundGraphic);
+        
+        //chuẩn bị hình ảnh slidingTile
+        tileSprite.setPosition(0, 0);
+        tileSprite.setFrame(cell[cursor[0]][cursor[1]]);
+        //tileSprite.paint(slidingTile.getGraphics());
+        tileSprite.paint(tileGraphic);
+        
+        calcDirection();
+        
+        //chuẩn bị thông tin vị trí xuất phát
+        slidingPositionX = cursor[1] * 12 + 104;
+        slidingPositionY = cursor[0] * 12 + 24;
+        
+        //chuẩn bị thông tin đích đến, hướng di chuyển
+        switch(aimDirection) {
+            case Play.COMMAND_UP:
+                slidingTargetX = cursor[1] * 12 + 104;
+                slidingTargetY = 12;
+                slidingDeltaX = 0;
+                slidingDeltaY = -12;
+                break;
+
+            case Play.COMMAND_RIGHT:
+                slidingTargetX = 296;
+                slidingTargetY = cursor[0] * 12 + 24;
+                slidingDeltaX = 12;
+                slidingDeltaY = 0;
+                break;
+
+            case Play.COMMAND_DOWN:
+                slidingTargetX = cursor[1] * 12 + 104;
+                slidingTargetY = 216;
+                slidingDeltaX = 0;
+                slidingDeltaY = 12;
+                break;
+
+            case Play.COMMAND_LEFT:
+                slidingTargetX = 92;
+                slidingTargetY = cursor[0] * 12 + 24;
+                slidingDeltaX = -12;
+                slidingDeltaY = 0;
+                break;
+        }
+    }
+    
+    private void finishSliding() {
+        if(cell[cursor[0]][cursor[1]] <= 2) {
+            //đưa vào
+            backgroundGraphic.drawImage(tileImage, slidingPositionX, slidingPositionY, Graphics.LEFT | Graphics.TOP);
+            cell[cursor[0]][cursor[1]] += 3;
+        } else {
+            //lấy ra
+            cell[cursor[0]][cursor[1]] -= 3;
+        }
+        isSliding = false;
+        if(isAuto) nextTurn = 10;
+    }
+    
+    private void calcDirection() {
+        byte thisCell = cell[cursor[0]][cursor[1]];
+        int i, stopCell;
+        
+        //kiểm tra theo hướng lên trên
+        if(cursor[0] < 15) stopCell = cell[cursor[0]+1][cursor[1]];
+        else stopCell = 0;
+        if((cursor[0] < 15 && thisCell <= 2 && stopCell > 2) || (thisCell == 3 || thisCell == 4)) {
+            i = cursor[0] - 1;
+            while(i > -1) {
+                if(cell[i][cursor[1]] > 2) break;
+                i--;
+            }
+            if(i == -1) {
+                aimDirection = (thisCell <= 2) ? Play.COMMAND_DOWN : Play.COMMAND_UP;
+                return;
+            }
+        }
+        
+        //kiểm tra theo hướng sang phải
+        if(cursor[1] > 0) stopCell = cell[cursor[0]][cursor[1]-1];
+        else stopCell = 0;
+        if((cursor[1] > 0 && thisCell <= 2 && stopCell > 2) || (thisCell == 3 || thisCell == 4)) {
+            i = cursor[1] + 1;
+            while(i < 16) {
+                if(cell[cursor[0]][i] > 2) break;
+                i++;
+            }
+            if(i == 16) {
+                aimDirection = (thisCell <= 2) ? Play.COMMAND_LEFT : Play.COMMAND_RIGHT;
+                return;
+            }
+        }
+        
+        //kiểm tra theo hướng xuống dưới
+        if(cursor[0] > 0) stopCell = cell[cursor[0]-1][cursor[1]];
+        else stopCell = 0;
+        if((cursor[0] > 0 && thisCell <= 2 && stopCell > 2) || (thisCell == 3 || thisCell == 4)) {
+            i = cursor[0] + 1;
+            while(i < 16) {
+                if(cell[i][cursor[1]] > 2) break;
+                i++;
+            }
+            if(i == 16) {
+                aimDirection = (thisCell <= 2) ? Play.COMMAND_UP : Play.COMMAND_DOWN;
+            }
+        }
+        
+        //kiểm tra theo hướng sang trái
+        if(cursor[1] < 15) stopCell = cell[cursor[0]][cursor[1]+1];
+        else stopCell = 0;
+        if((cursor[1] < 15 && thisCell <= 2 && stopCell > 2) || (thisCell == 3 || thisCell == 4)) {
+            i = cursor[1] - 1;
+            while(i > -1) {
+                if(cell[cursor[0]][i] > 2) break;
+                i--;
+            }
+            if(i == -1) {
+                aimDirection = (thisCell <= 2) ? Play.COMMAND_RIGHT : Play.COMMAND_LEFT;
+                return;
+            }
+        }
+    }
+    
+    public void dispose() {
+        isLoading = true;
+        backgroundGraphic = null;
+        tileGraphic = null;
+        backgroundImage = null;
+        tileImage = null;
+        cell = null;
+        cursor = null;
+        data = null;
+        processData = null;
+        tileSprite = null;
+    }
+}

@@ -30,7 +30,7 @@ import util.StringHelper;
  *
  * @author Thinh Pham
  */
-public class PlayScene extends LazyScene {
+public class PlayScene extends GameScene {
     
     static final byte TILE_NONE = 0;
     static final byte TILE_WANT = 1;
@@ -103,11 +103,14 @@ public class PlayScene extends LazyScene {
     private String hintData;
     private ButtonSprite[] buttons;
     
-    public PlayScene(Main parent, int templeId, int puzzleId) {
-        super(parent);
+    private final Main main;
+    
+    public PlayScene(Main main, int templeId, int puzzleId) {
+        super();
+        this.main = main;
         this.puzzleId = puzzleId;
         this.templeId = templeId;
-        startLazyLoad();
+        lazyLoad();
         begin(100);
     }
     

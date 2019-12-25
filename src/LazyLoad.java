@@ -25,9 +25,9 @@ import util.ImageHelper;
  */
 class LazyLoad extends Thread {
     
-    private final LazyScene scene;
+    private final GameScene scene;
     
-    LazyLoad(LazyScene scene) {
+    LazyLoad(GameScene scene) {
         this.scene = scene;
     }
     

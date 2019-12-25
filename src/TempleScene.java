@@ -28,7 +28,7 @@ import util.StringHelper;
  *
  * @author Thinh Pham
  */
-public class TempleScene extends LazyScene implements StoryPlayer {
+public class TempleScene extends GameScene implements StoryPlayer {
     
     static final int TEMPLE_NONE = -1;
     static final int TEMPLE_CYLOP = 0;
@@ -83,15 +83,18 @@ public class TempleScene extends LazyScene implements StoryPlayer {
     
     private final Button btnBack = new Button(0, 0, 80, 50);
     
-    public TempleScene(Main parent, int templeId) {
-        this(parent, templeId, 0);
+    private final Main main;
+    
+    public TempleScene(Main main, int templeId) {
+        this(main, templeId, 0);
     }
     
-    public TempleScene(Main parent, int templeId, int marginTop) {
-        super(parent);
+    public TempleScene(Main main, int templeId, int marginTop) {
+        super();
+        this.main = main;
         this.templeId = templeId;
         this.marginTop = marginTop;
-        startLazyLoad();
+        lazyLoad();
         begin(100);
     }
     

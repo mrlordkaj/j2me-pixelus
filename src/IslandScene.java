@@ -28,7 +28,7 @@ import util.StringHelper;
  *
  * @author Thinh Pham
  */
-class IslandScene extends LazyScene implements StoryPlayer {
+class IslandScene extends GameScene implements StoryPlayer {
     
 //#if ScreenWidth == 400
 //#     private static final int[][] TEMPLE_RECTANGLE = new int[][] {
@@ -72,9 +72,12 @@ class IslandScene extends LazyScene implements StoryPlayer {
     private Sprite starSprite;
     private Story story;
     
-    public IslandScene(Main parent) {
-        super(parent);
-        startLazyLoad();
+    private final Main main;
+    
+    public IslandScene(Main main) {
+        super();
+        this.main = main;
+        lazyLoad();
         begin(100);
     }
     

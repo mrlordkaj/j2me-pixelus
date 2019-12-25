@@ -56,11 +56,11 @@ public class MenuScene extends GameScene implements CommandListener {
     public MenuScene(Main parent) {
         super();
         this.parent = parent;
-        prepareResource();
-        start(40);
+        load();
+        begin(40);
     }
     
-    final void prepareResource() {
+    final void load() {
         backgroundImage = ImageHelper.loadImage("/images/mainmenubackground.png");
 //        if(parent.displayAds) {
 //            ads = IADView.getBannerAdData(parent, Main.NAX_CODE);
@@ -85,6 +85,15 @@ public class MenuScene extends GameScene implements CommandListener {
                 "Welcome back, " + parent.playerName + "!" :
                 "Hey mortal! Who are you?";
         isLoading = false;
+    }
+    
+    void unload() {
+        backgroundImage = null;
+        confirmDialogImage = null;
+        menuItems = null;
+        tempName = null;
+        txtPlayerName = null;
+//        ads = null;
     }
     
     protected void update() { }
@@ -263,17 +272,6 @@ public class MenuScene extends GameScene implements CommandListener {
             if (touching)
                 setActiveMenu(x, y);
         }
-    }
-    
-    public void dispose() {
-        isLoading = true;
-        isPlaying = false;
-        backgroundImage = null;
-        confirmDialogImage = null;
-        menuItems = null;
-        tempName = null;
-        txtPlayerName = null;
-//        ads = null;
     }
     
     private void setActiveMenu(int x, int y) {

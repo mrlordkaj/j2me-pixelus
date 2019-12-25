@@ -119,25 +119,25 @@ public class Main extends MIDlet {
     }
     
     public void gotoMainMenu() {
-        child.dispose();
+        child.destroy();
         child = new MenuScene(this);
         Display.getDisplay(this).setCurrent(child);
     }
     
     public void gotoIslandMap() {
-        child.dispose();
+        child.destroy();
         child = new IslandScene(this);
         Display.getDisplay(this).setCurrent(child);
     }
     
     public void gotoHelp() {
-        child.dispose();
+        child.destroy();
         child = new HelpScene(this);
         Display.getDisplay(this).setCurrent(child);
     }
     
     public void gotoTemple(int templeId, boolean isMarginTop) {
-        child.dispose();
+        child.destroy();
         child = isMarginTop ?
                 new TempleScene(this, templeId, templeMarginTop) :
                 new TempleScene(this, templeId);
@@ -146,7 +146,7 @@ public class Main extends MIDlet {
     
     public void gotoPlay(int puzzleId, int templeId, int templeMarginTop) {
         this.templeMarginTop = templeMarginTop;
-        child.dispose();
+        child.destroy();
         child = new PlayScene(this, templeId, puzzleId);
         Display.getDisplay(this).setCurrent(child);
     }

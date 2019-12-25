@@ -75,10 +75,10 @@ class IslandScene extends LazyScene implements StoryPlayer {
     public IslandScene(Main parent) {
         super(parent);
         startLazyLoad();
-        start(100);
+        begin(100);
     }
     
-    void prepareResource() {
+    void load() {
         // load record store
         try {
             RecordStore rs = RecordStore.openRecordStore(Main.RMS_USER, false);
@@ -129,7 +129,14 @@ class IslandScene extends LazyScene implements StoryPlayer {
             story = Story.getStory(Story.STORY_CYLOP_CYLOP, this);
     }
     
-    protected void update() {
+    void unload() {
+        islandImage = null;
+        lightingImage = null;
+        lightingPosition = null;
+        templeArrowImage = null;
+    }
+    
+    void update() {
         if (!isLoading) {
             if (story != null) {
                 story.update();
@@ -272,14 +279,7 @@ class IslandScene extends LazyScene implements StoryPlayer {
         }
     }
     
-    public void dispose() {
-        isLoading = true;
-        isPlaying = false;
-        islandImage = null;
-        lightingImage = null;
-        lightingPosition = null;
-        templeArrowImage = null;
-    }
+    
     
     public void closeStory() {
         story.dispose();

@@ -15,28 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.game.GameCanvas;
-import javax.microedition.lcdui.game.Sprite;
-import util.ImageHelper;
 
 /**
  *
  * @author Thinh Pham
  */
-public abstract class GameScene extends GameCanvas implements Runnable {
+abstract class GameScene extends GameCanvas implements Runnable {
     
-    private static Sprite loadingSprite;
+    abstract void load();
+    abstract void unload();
+    abstract void update();
     
-    protected boolean isLoading = true;
-    public short framePeriod;
-    protected boolean isPlaying;
+    short framePeriod;
+    boolean isLoading = true;
+    private boolean isPlaying;
+    final Thread thread;
     
-    abstract void prepareResource();
-    
-    public GameScene() {
+    GameScene() {
         super(false);
         setFullScreenMode(true);
+        thread = new Thread(this);
     }
     
     public void run() {
@@ -49,38 +48,22 @@ public abstract class GameScene extends GameCanvas implements Runnable {
         }
     }
     
-    protected final void start(int framePeriod) {
+    final void begin(int framePeriod) {
         this.framePeriod = (short) framePeriod;
         if (!isPlaying) {
             isPlaying = true;
-            new Thread(this).start();
+            thread.start();
         }
     }
     
-    protected final void stop() {
+    final void destroy() {
         isPlaying = false;
+        isLoading = true;
+        thread.interrupt();
+        unload();
     }
     
-    protected abstract void update();
-    
-    public abstract void dispose();
-    
-    protected boolean isLoading() {
-        return isLoading;
-    }
-    
-    protected boolean isLoading(Graphics g) {
-        if (isLoading) {
-            if (loadingSprite == null) {
-                loadingSprite = new Sprite(ImageHelper.loadImage("/images/juggling.png"), 20, 26);
-                loadingSprite.setPosition(Main.SCREEN_WIDTH / 2 - 46, Main.SCREEN_HEIGHT / 2);
-            }
-            g.fillRect(0, 0, Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
-            loadingSprite.nextFrame();
-            loadingSprite.paint(g);
-            g.setColor(255, 255, 255);
-            g.drawString("loading...", Main.SCREEN_WIDTH / 2 - 16, Main.SCREEN_HEIGHT / 2 + 20, Graphics.LEFT | Graphics.BASELINE);
-        }
+    boolean isLoading() {
         return isLoading;
     }
 }

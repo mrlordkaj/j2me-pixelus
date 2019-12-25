@@ -46,11 +46,16 @@ public class SplashScene extends GameScene {
     public SplashScene(Main parent) {
         super();
         this.parent = parent;
-        start(2000);
+        begin(2000);
     }
     
-    void prepareResource() {
+    void load() {
         
+    }
+    
+    void unload() {
+        backgroundTexture = null;
+        ads = null;
     }
     
     public void setLoadingStatus(boolean status) {
@@ -135,13 +140,6 @@ public class SplashScene extends GameScene {
         else if (currentScreen == SCREEN_SPLASH) {
             parent.gotoMainMenu();
         }
-    }
-    
-    public void dispose() {
-        isLoading = true;
-        isPlaying = false;
-        backgroundTexture = null;
-        ads = null;
     }
     
     private void nextScreen() {

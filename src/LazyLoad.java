@@ -33,7 +33,7 @@ class LazyLoad extends Thread {
     
     public void run() {
         try {
-            scene.prepareResource();
+            scene.load();
             Thread.sleep(1000);
             System.gc();
             scene.isLoading = false;

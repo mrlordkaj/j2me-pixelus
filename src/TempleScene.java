@@ -92,10 +92,10 @@ public class TempleScene extends LazyScene implements StoryPlayer {
         this.templeId = templeId;
         this.marginTop = marginTop;
         startLazyLoad();
-        start(100);
+        begin(100);
     }
     
-    void prepareResource() {
+    void load() {
         puzzleViewHeight = ((Puzzle.PUZZLE_FIRSTID[templeId + 1] - Puzzle.PUZZLE_FIRSTID[templeId]) / 3) * PUZZLE_IMAGE_SIZE - 4;
         try {
             RecordStore rs = RecordStore.openRecordStore(Main.RMS_USER, false);
@@ -223,6 +223,14 @@ public class TempleScene extends LazyScene implements StoryPlayer {
         scrollerImage = ImageHelper.loadImage("/images/scroller.png");
         // change framerate
         framePeriod = 40;
+    }
+    
+    void unload() {
+        if (story != null) {
+            story.dispose();
+            story = null;
+        }
+        backgroundImage = null;
     }
     
     private void clearNotify() {
@@ -418,16 +426,6 @@ public class TempleScene extends LazyScene implements StoryPlayer {
         }
         touching = false;
         dragging = false;
-    }
-    
-    public void dispose() {
-        isLoading = true;
-        isPlaying = false;
-        if (story != null) {
-            story.dispose();
-            story = null;
-        }
-        backgroundImage = null;
     }
     
     private void selectPuzzle() {

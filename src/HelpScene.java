@@ -24,7 +24,7 @@ import util.ImageHelper;
  *
  * @author Thinh Pham
  */
-public class HelpScene extends GameScene {
+class HelpScene extends GameScene {
     
     private boolean touching = false;
     private Image backgroundImage, titleImage;
@@ -70,17 +70,23 @@ public class HelpScene extends GameScene {
     private int marginTop = Main.SCREEN_HEIGHT + 20;
     private final Main parent;
     
-    public HelpScene(Main parent) {
+    HelpScene(Main parent) {
         super();
         this.parent = parent;
-        prepareResource();
-        start(80);
+        load();
+        begin(80);
     }
     
-    final void prepareResource() {
+    final void load() {
         backgroundImage = ImageHelper.loadImage("/images/storybackground.png");
         titleImage = ImageHelper.loadImage("/images/helptitle.png");
         isLoading = false;
+    }
+    
+    void unload() {
+        backgroundImage = null;
+        titleImage = null;
+        helpContent = null;
     }
     
 //#if ScreenWidth == 400
@@ -89,12 +95,11 @@ public class HelpScene extends GameScene {
     private static final int MARGIN_TOP_MIN = 70;
 //#endif
     
-    protected void update() {
+    void update() {
         if (!isLoading) {
             if (marginTop > MARGIN_TOP_MIN - helpContent.length * 20) {
                 marginTop -= touching ? 4 : 1;
-            }
-            else {
+            } else {
                 marginTop = Main.SCREEN_HEIGHT + 20;
             }
         }
@@ -114,21 +119,12 @@ public class HelpScene extends GameScene {
     protected void pointerPressed(int x, int y) {
         if (x > 0 && x < 80 && y > 0 && y < 60) {
             parent.gotoMainMenu();
-        }
-        else {
+        } else {
             touching = true;
         }
     }
     
     protected void pointerReleased(int x, int y) {
         touching = false;
-    }
-    
-    public void dispose() {
-        isLoading = true;
-        isPlaying = false;
-        backgroundImage = null;
-        titleImage = null;
-        helpContent = null;
     }
 }

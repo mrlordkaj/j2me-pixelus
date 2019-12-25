@@ -32,24 +32,24 @@ import util.StringHelper;
  */
 public class PlayScene extends LazyScene {
     
-    public static final byte TILE_NONE = 0;
-    public static final byte TILE_WANT = 1;
-    public static final byte TILE_STICKY = 2;
-    public static final byte TILE_RED = 3;
-    public static final byte TILE_BLUE = 4;
-    public static final byte TILE_GREEN = 5;
-    public static final byte TILE_DARKBLUE = 6;
-    public static final byte COMMAND_NONE = -1;
-    public static final byte COMMAND_UP = 0;
-    public static final byte COMMAND_RIGHT = 1;
-    public static final byte COMMAND_DOWN = 2;
-    public static final byte COMMAND_LEFT = 3;
-    public static final byte COMMAND_FIRE = 4;
-    public static final byte COMMAND_BACK = 5;
-    public static final byte COMMAND_RESET = 6;
-    public static final byte CURTAIN_NONE = -1;
-    public static final byte CURTAIN_FINISH = 0;
-    public static final byte CURTAIN_HINT = 1;
+    static final byte TILE_NONE = 0;
+    static final byte TILE_WANT = 1;
+    static final byte TILE_STICKY = 2;
+    static final byte TILE_RED = 3;
+    static final byte TILE_BLUE = 4;
+    static final byte TILE_GREEN = 5;
+    static final byte TILE_DARKBLUE = 6;
+    static final byte COMMAND_NONE = -1;
+    static final byte COMMAND_UP = 0;
+    static final byte COMMAND_RIGHT = 1;
+    static final byte COMMAND_DOWN = 2;
+    static final byte COMMAND_LEFT = 3;
+    static final byte COMMAND_FIRE = 4;
+    static final byte COMMAND_BACK = 5;
+    static final byte COMMAND_RESET = 6;
+    static final byte CURTAIN_NONE = -1;
+    static final byte CURTAIN_FINISH = 0;
+    static final byte CURTAIN_HINT = 1;
     
     private Image viewpotImage, sidebarImage, navImage, possibleMask, imposibleMask, confirmDialogImage;
     private Image slidingTile, stackImage, cellMask, curtainImage, puzzleCompleteImage, quickMenuImage, tutorialImage;
@@ -108,10 +108,10 @@ public class PlayScene extends LazyScene {
         this.puzzleId = puzzleId;
         this.templeId = templeId;
         startLazyLoad();
-        start(100);
+        begin(100);
     }
     
-    void prepareResource() {
+    void load() {
         if (templeId != TempleScene.TEMPLE_CYLOP) {
             try {
                 RecordStore rs = RecordStore.openRecordStore(Main.RMS_USER, false);
@@ -277,6 +277,42 @@ public class PlayScene extends LazyScene {
         
         if (templeId == TempleScene.TEMPLE_CYLOP)
             prepareTutorialStep();
+    }
+    
+    void unload() {
+        viewpotImage = null;
+        sidebarImage = null;
+        navImage = null;
+        possibleMask = null;
+        imposibleMask = null;
+        confirmDialogImage = null;
+        slidingTile = null;
+        stackImage = null;
+        cellMask = null;
+        curtainImage = null;
+        puzzleCompleteImage = null;
+        quickMenuImage = null;
+        tutorialImage = null;
+        aimImage = null;
+        characterSprite = null;
+        tileSprite = null;
+        shruggingSprite = null;
+        celebratingSprite = null;
+        rgb = null;
+        tutorialCell = null;
+        viewpotGraphic = null;
+        slidingTileGraphic = null;
+        curtainX = null;
+        puzzleTitle = null;
+        cell = null;
+        defaultData = null;
+        cursor = null;
+        undoCell = null;
+        undoDirection = null;
+        hint = null;
+        tutorial = null;
+        hintData = null;
+        buttons = null;
     }
     
     public void paint(Graphics g) {
@@ -1393,43 +1429,5 @@ public class PlayScene extends LazyScene {
         hint.dispose();
         hint = null;
         framePeriod = 100;
-    }
-    
-    public void dispose() {
-        isLoading = true;
-        isPlaying = false;
-        viewpotImage = null;
-        sidebarImage = null;
-        navImage = null;
-        possibleMask = null;
-        imposibleMask = null;
-        confirmDialogImage = null;
-        slidingTile = null;
-        stackImage = null;
-        cellMask = null;
-        curtainImage = null;
-        puzzleCompleteImage = null;
-        quickMenuImage = null;
-        tutorialImage = null;
-        aimImage = null;
-        characterSprite = null;
-        tileSprite = null;
-        shruggingSprite = null;
-        celebratingSprite = null;
-        rgb = null;
-        tutorialCell = null;
-        viewpotGraphic = null;
-        slidingTileGraphic = null;
-        curtainX = null;
-        puzzleTitle = null;
-        cell = null;
-        defaultData = null;
-        cursor = null;
-        undoCell = null;
-        undoDirection = null;
-        hint = null;
-        tutorial = null;
-        hintData = null;
-        buttons = null;
     }
 }

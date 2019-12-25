@@ -29,18 +29,18 @@ import util.StringHelper;
  */
 public class TempleScene extends GameScene implements StoryPlayer {
     
-    public static final int TEMPLE_NONE = -1;
-    public static final int TEMPLE_CYLOP = 0;
-    public static final int TEMPLE_FLORA = 1;
-    public static final int TEMPLE_CUPID = 2;
-    public static final int TEMPLE_NEPTUNE = 3;
-    public static final int TEMPLE_VENUS = 4;
-    public static final int TEMPLE_BACCHUS = 5;
-    public static final int TEMPLE_VULCAN = 6;
-    public static final int TEMPLE_DIANA = 7;
-    public static final int TEMPLE_PROSERPINA = 8;
-    public static final int TEMPLE_JUPITER = 9;
-    public static final short[] TEMPLE_REQUIRE = new short[] { 194, 0, 9, 20, 34, 50, 72, 100, 128, 160 };
+    static final int TEMPLE_NONE = -1;
+    static final int TEMPLE_CYLOP = 0;
+    static final int TEMPLE_FLORA = 1;
+    static final int TEMPLE_CUPID = 2;
+    static final int TEMPLE_NEPTUNE = 3;
+    static final int TEMPLE_VENUS = 4;
+    static final int TEMPLE_BACCHUS = 5;
+    static final int TEMPLE_VULCAN = 6;
+    static final int TEMPLE_DIANA = 7;
+    static final int TEMPLE_PROSERPINA = 8;
+    static final int TEMPLE_JUPITER = 9;
+    static final short[] TEMPLE_REQUIRE = new short[] { 194, 0, 9, 20, 34, 50, 72, 100, 128, 160 };
     
     public Image puzzleViewImage, scrollerImage, backgroundImage, buttonImage, selectedPuzzleImage;
     public Image messageDialogImage, confirmDialogImage;

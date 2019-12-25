@@ -19,7 +19,9 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.Sprite;
-import util.GraphicButton;
+//#if ScreenWidth == 400
+//# import util.GraphicButton;
+//#endif
 import util.DataHelper;
 import util.ImageHelper;
 
@@ -45,6 +47,10 @@ public class Loader extends Thread {
         else if (parent instanceof PlayScene) {
             loadPlayResource((PlayScene) parent);
         }
+        try {
+            Thread.sleep(1000);
+            System.gc();
+        } catch (InterruptedException ex) { }
         parent.isLoading = false;
     }
     
@@ -67,9 +73,7 @@ public class Loader extends Thread {
                 // draw normal temple
                 g.drawImage(ImageHelper.loadImage("/images/map" + Story.CHARACTER_NAMES[i].toLowerCase() + "a.png"), IslandScene.TEMPLE_RECTANGLE[i][0], IslandScene.TEMPLE_RECTANGLE[i][1], Graphics.LEFT | Graphics.TOP);
             }
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {}
+            System.gc();
         }
         
         map.lightingImage = ImageHelper.loadImage("/images/lighting.png");
@@ -79,9 +83,6 @@ public class Loader extends Thread {
         if (map.newTemple == 0) {
             map.story = Story.getStory(Story.STORY_CYLOP_CYLOP, map);
         }
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {}
     }
     
 //#if ScreenWidth == 400
@@ -119,10 +120,7 @@ public class Loader extends Thread {
                 if (i > temple.getSolvedPuzzle() + 1) {
                     g.drawImage(lockImage, x, y, Graphics.LEFT | Graphics.TOP);
                 }
-                try {
-                    Thread.sleep(10);
-                }
-                catch (InterruptedException ex) { }
+                System.gc();
             }
         }
         else {
@@ -132,29 +130,21 @@ public class Loader extends Thread {
             for (int i = 0; i < numPuzzle; i++) {
                 int y = (i / 3) * PUZZLE_IMAGE_SIZE;
                 int x = (i % 3) * PUZZLE_IMAGE_SIZE;
-                if (temple.bestAmountTurn(i) > 0) {
+                if (temple.bestAmountTurn(i) > 0)
                     drawPuzzleImage(i + Puzzle.PUZZLE_FIRSTID[templeId], x, y, IMAGE_PIXEL_SIZE, g, pixelMask, temple.medal(i));
-                } else {
+                else
                     drawPuzzleCover(i + Puzzle.PUZZLE_FIRSTID[templeId], x, y, IMAGE_PIXEL_SIZE, g, pixelMask, temple.medal(i));
-                }
-                try {
-                    Thread.sleep(10);
-                }
-                catch (InterruptedException ex) { }
+                System.gc();
             }
             if (!temple.lastPuzzleIsUnlocked()) {
                 g.drawImage(lockImage, width, height, Graphics.RIGHT | Graphics.BOTTOM);
             }
         }
         // remaining temples
-        temple.backgroundImage = ImageHelper.loadImage("/images/temple" + Story.CHARACTER_NAMES[((TempleScene)parent).getTempleId()].toLowerCase() + ".png");
+        temple.backgroundImage = ImageHelper.loadImage("/images/temple" + Story.CHARACTER_NAMES[temple.getTempleId()].toLowerCase() + ".png");
         temple.buttonImage = ImageHelper.loadImage("/images/buttongold.png");
         temple.scrollerImage = ImageHelper.loadImage("/images/scroller.png");
-        
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {}
-        
+        // change framerate
         temple.framePeriod = 40;
     }
     
@@ -306,11 +296,6 @@ public class Loader extends Thread {
         if (play.getTempleId() == TempleScene.TEMPLE_CYLOP) {
             play.prepareTutorialStep();
         }
-        
-        try {
-            Thread.sleep(1000);
-        }
-        catch (InterruptedException ex) { }
     }
     
 //#if ScreenWidth == 400
@@ -319,7 +304,7 @@ public class Loader extends Thread {
     private static final int MEDAL_SPRITE_TOP = 24;
 //#endif
     
-    public static void drawPuzzleCover(int puzzleId, int x, int y, int pixelSize, Graphics g, Image pixelMask, int medal) {
+    static void drawPuzzleCover(int puzzleId, int x, int y, int pixelSize, Graphics g, Image pixelMask, int medal) {
         Puzzle puzzle = Puzzle.getPuzzle(puzzleId);
         String data = puzzle.getData();
         for (short i = 0; i < 16*16; i++) {
@@ -364,7 +349,7 @@ public class Loader extends Thread {
         }
     }
     
-    public static void drawPuzzleImage(int puzzleId, int x, int y, int pixelSize, Graphics g, Image pixelMask, int medal) {
+    static void drawPuzzleImage(int puzzleId, int x, int y, int pixelSize, Graphics g, Image pixelMask, int medal) {
         String name = Puzzle.getPuzzle(puzzleId).getName();
         Image img = ImageHelper.loadImage("/data/images/" + name + ".gif");
         int[] rgb = new int[16*16];

@@ -153,7 +153,7 @@ public class SplashScene extends GameScene {
                     backgroundTexture = null;
                     ads = IADView.getBannerAdData(parent, Main.NAX_CODE);
                     if (ads == null) {
-                        waiting = 30;
+                        waiting = 2;
                         framePeriod = 1000;
                     }
                 }

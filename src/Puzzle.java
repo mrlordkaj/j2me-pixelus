@@ -15,35 +15,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import util.IOHelper;
+import util.DataHelper;
 
 /**
  *
  * @author Thinh Pham
  */
 public class Puzzle {
-    public static final int[] PUZZLE_FIRSTID = new int[] {1, 10, 22, 37, 55, 76, 100, 127, 154, 181, 211};
+    
+    public static final int[] PUZZLE_FIRSTID = new int[] { 1, 10, 22, 37, 55, 76, 100, 127, 154, 181, 211 };
     public static final int MEDAL_NONE = 3;
     public static final int MEDAL_BRONZE = 2;
     public static final int MEDAL_SILVER = 1;
     public static final int MEDAL_GOLDEN = 0;
     
-    private String name;
-    private String title;
-    private String data;
+    private final String name;
+    private final String title;
+    private final String data;
     
     public static Puzzle getPuzzle(int id) {
-        String[] puzzleData = IOHelper.readPuzzleData(id);
+        String[] puzzleData = DataHelper.readPuzzleData(id);
         return new Puzzle(puzzleData[0], puzzleData[1], puzzleData[2]);
     }
     
-    private Puzzle(String _name, String _title, String _data) {
-        name = _name;
-        title = _title;
-        data = _data;
+    private Puzzle(String name, String title, String data) {
+        this.name = name;
+        this.title = title;
+        this.data = data;
     }
     
-    public String getName() { return name; }
-    public String getTitle() { return title; }
-    public String getData() { return data; }
+    public String getName() {
+        return name;
+    }
+    
+    public String getTitle() {
+        return title;
+    }
+    
+    public String getData() {
+        return data;
+    }
 }

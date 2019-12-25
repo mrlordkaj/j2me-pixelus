@@ -22,8 +22,8 @@ import javax.microedition.lcdui.Graphics;
  * @author Thinh Pham
  */
 public abstract class StoryPage {
-    public abstract void update();
-    public abstract void paint(Graphics g);
-    public abstract void pointerPressed(int x, int y);
-    public abstract void dispose();
+    abstract void update();
+    abstract void paint(Graphics g);
+    abstract void pointerPressed(int x, int y);
+    abstract void dispose();
 }

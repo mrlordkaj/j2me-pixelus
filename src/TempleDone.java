@@ -24,19 +24,19 @@ import util.ImageHelper;
  *
  * @author Thinh Pham
  */
-public class TempleDone extends StoryPage{
+public class TempleDone extends StoryPage {
+    
     private Image backgroundImage, frontgroundImage;
     private boolean clickToReturn = true;
     private int textY = 210;
     private String[] text;
-    private Temple parent;
-    private int templeId;
+    private final TempleScene parent;
+    private final int templeId;
     
-    public TempleDone(int _templeId, Temple _parent) {
-        parent = _parent;
-        templeId = _templeId;
-        if(templeId == Temple.TEMPLE_JUPITER) clickToReturn = false;
-        if(templeId == Temple.TEMPLE_CYLOP) {
+    public TempleDone(int templeId, TempleScene parent) {
+        this.parent = parent;
+        this.templeId = templeId;
+        if (templeId == TempleScene.TEMPLE_CYLOP) {
             text = new String[] {
                 "Congratulations!",
                 "You have done well",
@@ -49,9 +49,11 @@ public class TempleDone extends StoryPage{
                 "TEST YOUR SKILL!"
             };
         } else {
+            if (templeId == TempleScene.TEMPLE_JUPITER)
+                clickToReturn = false;
             text = new String[] {
                 "The template of",
-                Story.characterName[templeId].toUpperCase(),
+                Story.CHARACTER_NAMES[templeId].toUpperCase(),
                 "holds no more",
                 "secrets for you!",
                 "Your victory is",
@@ -68,31 +70,56 @@ public class TempleDone extends StoryPage{
         frontgroundImage = ImageHelper.loadImage("/images/happyendingfg.png");
     }
     
+//#if ScreenWidth == 400
+//#     private static final int CYLOP_TEXT_TOP = 30;
+//#     private static final int TEMPLE_TEXT_TOP = -30;
+//#elif ScreenWidth == 320
+    private static final int CYLOP_TEXT_TOP = 40;
+    private static final int TEMPLE_TEXT_TOP = -20;
+//#endif
+    
     public void update() {
-        if(templeId == Temple.TEMPLE_CYLOP) {
-            if(textY > 30) textY -= 1;
+        if (templeId == TempleScene.TEMPLE_CYLOP) {
+            if (textY > CYLOP_TEXT_TOP)
+                textY -= 1;
         } else {
-            if(textY > -30) textY -= 1;
+            if (textY > TEMPLE_TEXT_TOP)
+                textY -= 1;
         }
     }
     
     public void paint(Graphics g) {
-        if(backgroundImage != null) g.drawImage(backgroundImage, 234, 132, Graphics.LEFT | Graphics.TOP);
-        if(templeId != Temple.TEMPLE_JUPITER || !clickToReturn) {
-            g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
-            for(byte i = 0; i < text.length; i++) {
-                g.drawString(text[i], 298, textY + 20*i, Graphics.HCENTER | Graphics.BASELINE);
+//#if ScreenWidth == 400
+//#         if (backgroundImage != null)
+//#             g.drawImage(backgroundImage, 234, 132, Graphics.LEFT | Graphics.TOP);
+//#         if (templeId != TempleScene.TEMPLE_JUPITER || !clickToReturn) {
+//#             g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
+//#             for (byte i = 0; i < text.length; i++) {
+//#                 g.drawString(text[i], 298, textY + 20*i, Graphics.HCENTER | Graphics.BASELINE);
+//#             }
+//#             g.drawImage(frontgroundImage, 0, 0, Graphics.LEFT | Graphics.TOP);
+//#         }
+//#elif ScreenWidth == 320
+        if (backgroundImage != null)
+            g.drawImage(backgroundImage, 160, 142, Graphics.LEFT | Graphics.TOP);
+        if (templeId != TempleScene.TEMPLE_JUPITER || !clickToReturn) {
+            g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+            for (byte i = 0; i < text.length; i++) {
+                g.drawString(text[i], 230, textY + 20*i, Graphics.HCENTER | Graphics.BASELINE);
             }
             g.drawImage(frontgroundImage, 0, 0, Graphics.LEFT | Graphics.TOP);
         }
+//#endif
     }
     
     public void pointerPressed(int x, int y) {
-        if(templeId == Temple.TEMPLE_CYLOP) {
-            if(textY == 30) parent.closeStory();
+        if (templeId == TempleScene.TEMPLE_CYLOP) {
+            if (textY == CYLOP_TEXT_TOP)
+                parent.closeStory();
         } else {
-            if(clickToReturn) {
-                if(textY == -30) parent.closeStory();
+            if (clickToReturn) {
+                if (textY == TEMPLE_TEXT_TOP)
+                    parent.closeStory();
             } else {
                 backgroundImage = ImageHelper.loadImage("/images/gamedone.png");
                 clickToReturn = true;

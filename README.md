@@ -7,8 +7,7 @@ This project was built on:
 - Netbeans IDE 8.2
 - JDK 7 Update 17
 - Nokia SDK 2.0
-
-Note: This project supports 400x240 resolution only.
+- Nokia Asha SDK 1.2
 
 Optional 3rd-party libraries:
 - Inneractive J2ME Ad SDK 1.0.9

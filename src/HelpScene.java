@@ -24,7 +24,8 @@ import util.ImageHelper;
  *
  * @author Thinh Pham
  */
-public class Help extends GamePage {
+public class HelpScene extends GameScene {
+    
     private boolean touching = false;
     private Image backgroundImage, titleImage;
     private String[] helpContent = new String[] {
@@ -51,10 +52,10 @@ public class Help extends GamePage {
         "==================",
         "CREDITS",
         "Gameplay & Art: Nuclide.com",
-        "Programming: Thịnh Phạm",
+        "Programming: Thinh Pham",
         "",
         "Pixelus is a trademark of Nuclide.com BVBA.",
-        "Copyright © 2004 - 2013 Nuclide. All rights reserved.",
+        "Copyright © 2004 Nuclide. All rights reserved.",
         "",
         "Pixelus Mobile is a non-commercial product which is",
         "developed by members of Openitvn under limited license",
@@ -66,18 +67,14 @@ public class Help extends GamePage {
         "Website: http://openitvn.net",
         "Support: mrlordkaj@gmail.com"
     };
-    private int marginTop = Main.SCREENSIZE_HEIGHT + 20;
+    private int marginTop = Main.SCREEN_HEIGHT + 20;
+    private final Main parent;
     
-    private Main parent;
-    
-    public Help(Main _parent) {
+    public HelpScene(Main parent) {
         super();
-        parent = _parent;
-        
+        this.parent = parent;
         prepareResource();
-        
-        schedule = 80;
-        new Thread(this).start();
+        start(80);
     }
     
     private void prepareResource() {
@@ -86,31 +83,39 @@ public class Help extends GamePage {
         isLoading = false;
     }
     
+//#if ScreenWidth == 400
+//#     private static final int MARGIN_TOP_MIN = 80;
+//#elif ScreenWidth == 320
+    private static final int MARGIN_TOP_MIN = 70;
+//#endif
+    
     protected void update() {
-        if(isLoading) return;
-        
-        if(marginTop > 84 - helpContent.length*20) {
-            if(touching) marginTop -= 4;
-            else marginTop--;
+        if (!isLoading) {
+            if (marginTop > MARGIN_TOP_MIN - helpContent.length * 20) {
+                marginTop -= touching ? 4 : 1;
+            }
+            else {
+                marginTop = Main.SCREEN_HEIGHT + 20;
+            }
         }
-        else marginTop = Main.SCREENSIZE_HEIGHT + 20;
     }
     
     public void paint(Graphics g) {
-        if(isLoading) return;
-        
-        g.drawImage(backgroundImage, 0, 0, Graphics.LEFT | Graphics.TOP);
-        g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
-        for(int i = 0; i < helpContent.length; i++) {
-            g.drawString(helpContent[i], Main.SCREENSIZE_WIDTH / 2, marginTop + i*20, Graphics.HCENTER | Graphics.BASELINE);
+        if (!isLoading) {
+            g.drawImage(backgroundImage, 0, 0, Graphics.LEFT | Graphics.TOP);
+            g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+            for (int i = 0; i < helpContent.length; i++) {
+                g.drawString(helpContent[i], Main.SCREEN_WIDTH / 2, marginTop + i*20, Graphics.HCENTER | Graphics.BASELINE);
+            }
+            g.drawImage(titleImage, 0, 0, Graphics.LEFT | Graphics.TOP);
         }
-        g.drawImage(titleImage, 0, 0, Graphics.LEFT | Graphics.TOP);
     }
     
     protected void pointerPressed(int x, int y) {
-        if(x > 0 && x < 80 && y > 0 && y < 60) {
+        if (x > 0 && x < 80 && y > 0 && y < 60) {
             parent.gotoMainMenu();
-        } else {
+        }
+        else {
             touching = true;
         }
     }
@@ -121,7 +126,7 @@ public class Help extends GamePage {
     
     public void dispose() {
         isLoading = true;
-        pageLooping = false;
+        isPlaying = false;
         backgroundImage = null;
         titleImage = null;
         helpContent = null;

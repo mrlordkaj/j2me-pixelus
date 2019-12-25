@@ -17,11 +17,11 @@
 
 import com.nokia.mid.ui.orientation.Orientation;
 import java.util.Calendar;
-import java.util.Timer;
-import java.util.TimerTask;
+//import java.util.Timer;
+//import java.util.TimerTask;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.game.Sprite;
-import javax.microedition.midlet.*;
+import javax.microedition.midlet.MIDlet;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 import util.ImageHelper;
@@ -31,8 +31,15 @@ import util.MathHelper;
  * @author Thinh Pham
  */
 public class Main extends MIDlet {
-    public static final int SCREENSIZE_WIDTH = 400;
-    public static final int SCREENSIZE_HEIGHT = 240;
+    
+//#if ScreenWidth == 400
+//#     public static final int SCREEN_WIDTH = 400;
+//#     public static final int SCREEN_HEIGHT = 240;
+//#elif ScreenWidth == 320
+    public static final int SCREEN_WIDTH = 320;
+    public static final int SCREEN_HEIGHT = 240;
+//#endif
+    
     public static final String RMS_SETTING = "setting";
     public static final int RMS_SETTING_DEVICEID = 1;
     public static final int RMS_SETTING_ADSTIME = 2;
@@ -43,125 +50,115 @@ public class Main extends MIDlet {
     public static final int RMS_USER_NEWTEMPLE = 205;
     public static final int RMS_USER_TEMPLESTATISTIC = 206;
     public static final String NAX_CODE = "Openitvn_Forum_Nokia";
-    public static final Sprite loadingSprite = new Sprite(ImageHelper.loadImage("/images/juggling.png"), 20, 26);
-    private int templeMarginTop;
     
+    private int templeMarginTop;
     public String playerName = "";
     public boolean displayAds = true;
-    private Timer timer;
-    private GamePage child;
+//    private Timer timer;
+    private GameScene child;
     
-    public void startApp() {
+    protected void startApp() {
+        // change device orientation to landspace
         try {
             Class.forName("com.nokia.mid.ui.orientation.Orientation");
             Orientation.setAppOrientation(Orientation.ORIENTATION_LANDSCAPE);
-        }
-        catch (ClassNotFoundException e) {}
-        
-        //neu chua co setting thi sinh ra mac dinh, dong thoi kiem tra thoi gian bam quang cao
-        defaultRecordStore();
-        loadUserName();
-        loadingSprite.setPosition(154, Main.SCREENSIZE_HEIGHT / 2);
-        
-        child = new Splash(this);
-        Display.getDisplay(this).setCurrent(child);
-        
-        //0.5 giay don rac mot lan
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            public void run() {
-                System.gc();
-            }
-        }, 0, 500);
-    }
-    
-    public void pauseApp() {
-    }
-    
-    public void destroyApp(boolean unconditional) {
-    }
-    
-    private void defaultRecordStore() {
+        }  catch (ClassNotFoundException ex) { }
+        // generate default setting if needed, then check time after ads clicked
         try {
             RecordStore rs = RecordStore.openRecordStore(RMS_SETTING, true);
             if (rs.getNumRecords() != 2) {
                 rs.closeRecordStore();
                 RecordStore.deleteRecordStore(RMS_SETTING);
-
                 rs = RecordStore.openRecordStore(RMS_SETTING, true);
-                byte[] writer = MathHelper.RandomDeviceId().getBytes();
-                rs.addRecord(writer, 0, writer.length); //dong 1 la deviceid
-                writer = "0".getBytes();
-                rs.addRecord(writer, 0, writer.length); //dong 2 la thoi gian bam quang cao
+                byte[] data = MathHelper.randomDeviceId();
+                rs.addRecord(data, 0, data.length); // line 1: deviceid
+                data = "0".getBytes();
+                rs.addRecord(data, 0, data.length); // line 2: ads click time
             } else {
                 long adsTime = Long.parseLong(new String(rs.getRecord(RMS_SETTING_ADSTIME)));
                 long currentTime = Calendar.getInstance().getTime().getTime();
-                if(currentTime - adsTime > 86400000) displayAds = true;
-                else displayAds = false;
+                displayAds = (currentTime - adsTime > 86400000);
             }
             rs.closeRecordStore();
-        } catch (RecordStoreException ex) {}
+        } catch (RecordStoreException ex) { }
+        // load user name from record store
+        try {
+            RecordStore rs = RecordStore.openRecordStore(Main.RMS_USER, false);
+            playerName = new String(rs.getRecord(RMS_USER_NAME));
+            rs.closeRecordStore();
+        } catch (RecordStoreException ex) { }
+        // set splash scene as start point
+        child = new SplashScene(this);
+        Display.getDisplay(this).setCurrent(child);
+        
+//        // runs gc each 0.5 secs
+//        timer = new Timer();
+//        timer.schedule(new TimerTask() {
+//            public void run() {
+//                System.gc();
+//            }
+//        }, 0, 500);
     }
+    
+    protected void pauseApp() { }
+    
+    protected void destroyApp(boolean unconditional) { }
     
     public void bannerPressed() {
         displayAds = false;
-        long currentTime = Calendar.getInstance().getTime().getTime();
+        long curTime = Calendar.getInstance().getTime().getTime();
         try {
             RecordStore rs = RecordStore.openRecordStore(Main.RMS_SETTING, false);
-            byte[] writer = Long.toString(currentTime).getBytes();
-            rs.setRecord(RMS_SETTING_ADSTIME, writer, 0, writer.length); //dong 2 la thoi gian bam quang cao
+            byte[] data = Long.toString(curTime).getBytes();
+            rs.setRecord(RMS_SETTING_ADSTIME, data, 0, data.length); // line 2: ads click time
             rs.closeRecordStore();
-        } catch (RecordStoreException ex) {}
+        }
+        catch (RecordStoreException ex) { }
     }
     
     public void gotoMainMenu() {
         child.dispose();
-        child = new MainMenu(this);
+        child = new MenuScene(this);
         Display.getDisplay(this).setCurrent(child);
     }
     
     public void gotoIslandMap() {
         child.dispose();
-        child = new IslandMap(this);
+        child = new IslandScene(this);
         Display.getDisplay(this).setCurrent(child);
     }
     
     public void gotoHelp() {
         child.dispose();
-        child = new Help(this);
+        child = new HelpScene(this);
         Display.getDisplay(this).setCurrent(child);
     }
     
     public void gotoTemple(int templeId, boolean isMarginTop) {
         child.dispose();
-        if(isMarginTop) child = new Temple(templeId, templeMarginTop, this);
-        else child = new Temple(templeId, this);
+        child = isMarginTop ?
+                new TempleScene(this, templeId, templeMarginTop) :
+                new TempleScene(this, templeId);
         Display.getDisplay(this).setCurrent(child);
     }
     
-    public void gotoPlay(int puzzleId, int templeId, int _templeMarginTop) {
-        templeMarginTop = _templeMarginTop;
+    public void gotoPlay(int puzzleId, int templeId, int templeMarginTop) {
+        this.templeMarginTop = templeMarginTop;
         child.dispose();
-        child = new Play(puzzleId, templeId, this);
+        child = new PlayScene(puzzleId, templeId, this);
         Display.getDisplay(this).setCurrent(child);
-    }
-    
-    private void loadUserName() {
-        try {
-            RecordStore rs = RecordStore.openRecordStore(Main.RMS_USER, false);
-            playerName = new String(rs.getRecord(RMS_USER_NAME));
-        } catch (RecordStoreException ex) {}
     }
     
     public void openTemple(int templeId) {
         try {
             RecordStore rs = RecordStore.openRecordStore(Main.RMS_USER, false);
             int openedTemple = Integer.parseInt(new String(rs.getRecord(RMS_USER_OPENEDTEMPLE))) + 1;
-            byte[] writer = Integer.toString(templeId).getBytes();
-            rs.setRecord(RMS_USER_NEWTEMPLE, writer, 0, writer.length); //cập nhật id của đền mới mở
-            writer = Integer.toString(openedTemple).getBytes();
-            rs.setRecord(RMS_USER_OPENEDTEMPLE, writer, 0, writer.length); //cập nhật số lượng temple đã mở
+            byte[] data = Integer.toString(templeId).getBytes();
+            rs.setRecord(RMS_USER_NEWTEMPLE, data, 0, data.length); // update new opened templeId
+            data = Integer.toString(openedTemple).getBytes();
+            rs.setRecord(RMS_USER_OPENEDTEMPLE, data, 0, data.length); // update number of opened temples
             rs.closeRecordStore();
-        } catch (RecordStoreException ex) {}
+        }
+        catch (RecordStoreException ex) { }
     }
 }

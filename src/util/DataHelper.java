@@ -23,65 +23,52 @@ import java.io.InputStream;
  *
  * @author Thinh Pham
  */
-public class IOHelper {
-    public static String read(String path) throws RuntimeException {
+public abstract class DataHelper {
+    
+    public static String readFile(String path) throws RuntimeException {
         try {
             InputStream is = InputStream.class.getResourceAsStream(path);
             StringBuffer sb = new StringBuffer();
-            int chars;
-            
-            while ((chars = is.read()) != -1) {
-                sb.append((char) chars);
+            int c;
+            while ((c = is.read()) != -1) {
+                sb.append((char) c);
             }
             return sb.toString();
         } catch (IOException ex) {
-            throw new RuntimeException("IOReader failed to load file:" + path + " " + ex.getMessage());
-        }
-    }
-    
-    public static int getFileSize(String path) throws RuntimeException {
-        try {
-            int count = 0;
-            InputStream is = InputStream.class.getResourceAsStream(path);
-            while (is.read() != -1) count++;
-            return count;
-        } catch (IOException ex) {
-            throw new RuntimeException("IOReader failed to load file:" + path + " " + ex.getMessage());
+            throw new RuntimeException(ex.getMessage());
         }
     }
     
     public static String[] readPuzzleData(int puzzleId) throws RuntimeException {
         try {
             String[] rs = new String[3];
-            InputStream _inStream = InputStream.class.getResourceAsStream("/data/puzzles.dat");
-            StringBuffer buf = new StringBuffer();
+            InputStream is = InputStream.class.getResourceAsStream("/data/puzzles.dat");
+            StringBuffer sb = new StringBuffer();
             int c;
-
             int curLine = 1;
-            while (((c = _inStream.read()) != -1)) {
+            while (((c = is.read()) != -1)) {
                 if (c == '\n') {
                     ++curLine;
-                    c = _inStream.read();
+                    c = is.read();
                 }
-                if(curLine == puzzleId) {
-                    if(c == '#') {
-                        rs[0] = buf.toString();
-                        buf = new StringBuffer();
+                if (curLine == puzzleId) {
+                    if (c == '#') {
+                        rs[0] = sb.toString();
+                        sb = new StringBuffer();
                     } else {
-                        buf.append((char) c);
+                        sb.append((char) c);
                     }
                 } else if(curLine > puzzleId) {
-                    rs[1] = buf.toString();
-                    rs[2] = read("/data/" + rs[0] + ".dat");
+                    rs[1] = sb.toString();
+                    rs[2] = readFile("/data/" + rs[0] + ".dat");
                     return rs;
                 }
             }
-
-            rs[1] = buf.toString();
-            rs[2] = read("/data/" + rs[0] + ".dat");
+            rs[1] = sb.toString();
+            rs[2] = readFile("/data/" + rs[0] + ".dat");
             return rs;
         } catch (IOException ex) {
-            throw new RuntimeException("Could not load data file: " + ex.getMessage());
+            throw new RuntimeException(ex.getMessage());
         }
     }
 }

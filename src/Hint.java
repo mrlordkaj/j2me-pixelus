@@ -25,23 +25,26 @@ import util.ImageHelper;
  * @author Thinh Pham
  */
 public class Hint {
+    
+    private static final int TILE_BOARD_X = 104;
+    
     private Image backgroundImage, tileImage;
     private Sprite tileSprite;
     private Graphics backgroundGraphic, tileGraphic;
     private byte[][] cell = new byte[16][16];
     private int[] cursor = new int[] {1, 1};
-    private byte aimDirection = Play.COMMAND_NONE;
+    private byte aimDirection = PlayScene.COMMAND_NONE;
     private int slidingPositionX, slidingPositionY, slidingDeltaX, slidingDeltaY, slidingTargetX, slidingTargetY;
     private boolean isSliding = false, isAuto = false, isLoading = true;
     private byte nextTurn = 0;
-    private Play parent;
+    private final PlayScene parent;
     private String data;
     private StringBuffer processData;
     
-    public Hint(String _data, Play _parent) {
-        parent = _parent;
-        data = _data;
-        backgroundImage = Image.createImage(Main.SCREENSIZE_WIDTH, Main.SCREENSIZE_HEIGHT);
+    public Hint(String data, PlayScene parent) {
+        this.parent = parent;
+        this.data = data;
+        backgroundImage = Image.createImage(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
         backgroundGraphic = backgroundImage.getGraphics();
         backgroundGraphic.drawImage(ImageHelper.loadImage("/images/hintbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
         tileSprite = new Sprite(ImageHelper.loadImage("/images/tile.png"), 12, 12);
@@ -53,35 +56,40 @@ public class Hint {
     
     private void reset() {
         processData = new StringBuffer(data);
-        for(byte i = 0; i < 16; i++) {
-            for(byte j = 0; j < 16; j++) {
+        for (byte i = 0; i < 16; i++) {
+            for (byte j = 0; j < 16; j++) {
                 tileSprite.setFrame(cell[i][j] = parent.defaultData[i][j]);
-                tileSprite.setPosition(j * 12 + 104, i * 12 + 24);
+                tileSprite.setPosition(j * 12 + TILE_BOARD_X, i * 12 + 24);
                 tileSprite.paint(backgroundGraphic);
             }
         }
     }
     
     public void update() {
-        if(isLoading) return;
-        
-        if(isSliding) {
-            slidingPositionX += slidingDeltaX;
-            slidingPositionY += slidingDeltaY;
-            if(slidingPositionX == slidingTargetX && slidingPositionY == slidingTargetY) finishSliding();
-        } else if(isAuto) {
-            if(--nextTurn <= 0) {
-                if(processData.length() > 0) doTurn();
-                else isAuto = false;
+        if (!isLoading) {
+            if (isSliding) {
+                slidingPositionX += slidingDeltaX;
+                slidingPositionY += slidingDeltaY;
+                if (slidingPositionX == slidingTargetX && slidingPositionY == slidingTargetY)
+                    finishSliding();
+            }
+            else if (isAuto) {
+                if (--nextTurn <= 0) {
+                    if (processData.length() > 0)
+                        doTurn();
+                    else
+                        isAuto = false;
+                }
             }
         }
     }
     
     public void paint(Graphics g) {
-        if(isLoading) return;
-        
-        g.drawImage(backgroundImage, 0, 0, Graphics.LEFT | Graphics.TOP);
-        if(isSliding) g.drawImage(tileImage, slidingPositionX, slidingPositionY, Graphics.LEFT | Graphics.TOP);
+        if (!isLoading) {
+            g.drawImage(backgroundImage, 0, 0, Graphics.LEFT | Graphics.TOP);
+            if (isSliding)
+                g.drawImage(tileImage, slidingPositionX, slidingPositionY, Graphics.LEFT | Graphics.TOP);
+        }
     }
     
     public void pointerPressed(int x, int y) {
@@ -89,31 +97,50 @@ public class Hint {
             parent.closeHint();
         }
         
-        if(isSliding || isAuto) return;
+        if (isSliding || isAuto) return;
         
-        if(x > 330 && x < 380 && y > 128 && y < 178) {
-            //nút one move
-            if(processData.length() > 0) doTurn();
-            else reset();
-        } else if(x > 330 && x < 380 && y > 184 && y < 234) {
-            //nút all moves
+        // TODO: predef button positions
+//#if ScreenWidth == 400
+//#         if (x > 330 && x < 380 && y > 128 && y < 178) {
+//#             // one move button
+//#             if (processData.length() > 0)
+//#                 doTurn();
+//#             else
+//#                 reset();
+//#         } else if (x > 330 && x < 380 && y > 184 && y < 234) {
+//#             // all moves button
+//#             isAuto = true;
+//#             reset();
+//#         }
+//#elif ScreenWidth == 320
+        if (x > 4 && x < 44 && y > 48 && y < 88) {
+            // one move button
+            if (processData.length() > 0)
+                doTurn();
+            else
+                reset();
+        } else if (x > 54 && x < 94 && y > 48 && y < 88) {
+            // all moves button
             isAuto = true;
             reset();
         }
+//#endif
     }
     
     private void doTurn() {
-        short cellIndex = (short)processData.charAt(0);
+        short cellIndex = (short) processData.charAt(0);
         cursor[0] = cellIndex / 16;
         cursor[1] = cellIndex % 16;
-        if(cell[cursor[0]][cursor[1]] <= 2) pushTile();
-        else removeTile();
+        if (cell[cursor[0]][cursor[1]] <= 2)
+            pushTile();
+        else
+            removeTile();
         isSliding = true;
         processData.deleteCharAt(0);
     }
     
     private void pushTile() {
-        //chuẩn bị hình ảnh slidingTile
+        // prepare slidingTile image
         tileSprite.setPosition(0, 0);
         tileSprite.setFrame(cell[cursor[0]][cursor[1]] + 3);
         //tileSprite.paint(slidingTile.getGraphics());
@@ -121,49 +148,49 @@ public class Hint {
         
         calcDirection();
         
-        //chuẩn bị thông tin vị trí xuất phát, hướng di chuyển
-        switch(aimDirection) {
-            case Play.COMMAND_UP:
-                slidingPositionX = cursor[1] * 12 + 104;
+        // prepare start position, move direction
+        switch (aimDirection) {
+            case PlayScene.COMMAND_UP:
+                slidingPositionX = cursor[1] * 12 + TILE_BOARD_X;
                 slidingPositionY = 216;
                 slidingDeltaX = 0;
                 slidingDeltaY = -12;
                 break;
 
-            case Play.COMMAND_RIGHT:
-                slidingPositionX = 92;
+            case PlayScene.COMMAND_RIGHT:
+                slidingPositionX = TILE_BOARD_X - 12;
                 slidingPositionY = cursor[0] * 12 + 24;
                 slidingDeltaX = 12;
                 slidingDeltaY = 0;
                 break;
 
-            case Play.COMMAND_DOWN:
-                slidingPositionX = cursor[1] * 12 + 104;
+            case PlayScene.COMMAND_DOWN:
+                slidingPositionX = cursor[1] * 12 + TILE_BOARD_X;
                 slidingPositionY = 12;
                 slidingDeltaX = 0;
                 slidingDeltaY = 12;
                 break;
 
-            case Play.COMMAND_LEFT:
-                slidingPositionX = 296;
+            case PlayScene.COMMAND_LEFT:
+                slidingPositionX = 192 + TILE_BOARD_X;
                 slidingPositionY = cursor[0] * 12 + 24;
                 slidingDeltaX = -12;
                 slidingDeltaY = 0;
                 break;
         }
         
-        //chuẩn bị thông tin về đích đến
+        // prepare destination
         slidingTargetX = cursor[1] * 12 + 104;
         slidingTargetY = cursor[0] * 12 + 24;
     }
     
     private void removeTile() {
-        //cập nhật lại hình ảnh background
+        // update background image
         tileSprite.setPosition(cursor[1] * 12 + 104, cursor[0] * 12 + 24);
         tileSprite.setFrame(cell[cursor[0]][cursor[1]] - 3);
         tileSprite.paint(backgroundGraphic);
         
-        //chuẩn bị hình ảnh slidingTile
+        // prepare slidingTile image
         tileSprite.setPosition(0, 0);
         tileSprite.setFrame(cell[cursor[0]][cursor[1]]);
         //tileSprite.paint(slidingTile.getGraphics());
@@ -171,35 +198,35 @@ public class Hint {
         
         calcDirection();
         
-        //chuẩn bị thông tin vị trí xuất phát
-        slidingPositionX = cursor[1] * 12 + 104;
+        // prepare start position
+        slidingPositionX = cursor[1] * 12 + TILE_BOARD_X;
         slidingPositionY = cursor[0] * 12 + 24;
         
-        //chuẩn bị thông tin đích đến, hướng di chuyển
-        switch(aimDirection) {
-            case Play.COMMAND_UP:
-                slidingTargetX = cursor[1] * 12 + 104;
+        // prepare destination position, move direction
+        switch (aimDirection) {
+            case PlayScene.COMMAND_UP:
+                slidingTargetX = cursor[1] * 12 + TILE_BOARD_X;
                 slidingTargetY = 12;
                 slidingDeltaX = 0;
                 slidingDeltaY = -12;
                 break;
 
-            case Play.COMMAND_RIGHT:
-                slidingTargetX = 296;
+            case PlayScene.COMMAND_RIGHT:
+                slidingTargetX = 192 + TILE_BOARD_X;
                 slidingTargetY = cursor[0] * 12 + 24;
                 slidingDeltaX = 12;
                 slidingDeltaY = 0;
                 break;
 
-            case Play.COMMAND_DOWN:
-                slidingTargetX = cursor[1] * 12 + 104;
+            case PlayScene.COMMAND_DOWN:
+                slidingTargetX = cursor[1] * 12 + TILE_BOARD_X;
                 slidingTargetY = 216;
                 slidingDeltaX = 0;
                 slidingDeltaY = 12;
                 break;
 
-            case Play.COMMAND_LEFT:
-                slidingTargetX = 92;
+            case PlayScene.COMMAND_LEFT:
+                slidingTargetX = TILE_BOARD_X - 12;
                 slidingTargetY = cursor[0] * 12 + 24;
                 slidingDeltaX = -12;
                 slidingDeltaY = 0;
@@ -208,78 +235,78 @@ public class Hint {
     }
     
     private void finishSliding() {
-        if(cell[cursor[0]][cursor[1]] <= 2) {
-            //đưa vào
+        if (cell[cursor[0]][cursor[1]] <= 2) {
+            // push in
             backgroundGraphic.drawImage(tileImage, slidingPositionX, slidingPositionY, Graphics.LEFT | Graphics.TOP);
             cell[cursor[0]][cursor[1]] += 3;
         } else {
-            //lấy ra
+            // pull out
             cell[cursor[0]][cursor[1]] -= 3;
         }
         isSliding = false;
-        if(isAuto) nextTurn = 10;
+        if (isAuto)
+            nextTurn = 10;
     }
     
     private void calcDirection() {
         byte thisCell = cell[cursor[0]][cursor[1]];
         int i, stopCell;
         
-        //kiểm tra theo hướng lên trên
-        if(cursor[0] < 15) stopCell = cell[cursor[0]+1][cursor[1]];
-        else stopCell = 0;
-        if((cursor[0] < 15 && thisCell <= 2 && stopCell > 2) || (thisCell == 3 || thisCell == 4)) {
+        // check up direction
+        stopCell = (cursor[0] < 15) ? cell[cursor[0]+1][cursor[1]] : 0;
+        if ((cursor[0] < 15 && thisCell <= 2 && stopCell > 2) || (thisCell == 3 || thisCell == 4)) {
             i = cursor[0] - 1;
-            while(i > -1) {
-                if(cell[i][cursor[1]] > 2) break;
+            while (i > -1) {
+                if (cell[i][cursor[1]] > 2)
+                    break;
                 i--;
             }
-            if(i == -1) {
-                aimDirection = (thisCell <= 2) ? Play.COMMAND_DOWN : Play.COMMAND_UP;
+            if (i == -1) {
+                aimDirection = (thisCell <= 2) ? PlayScene.COMMAND_DOWN : PlayScene.COMMAND_UP;
                 return;
             }
         }
         
-        //kiểm tra theo hướng sang phải
-        if(cursor[1] > 0) stopCell = cell[cursor[0]][cursor[1]-1];
-        else stopCell = 0;
-        if((cursor[1] > 0 && thisCell <= 2 && stopCell > 2) || (thisCell == 3 || thisCell == 4)) {
+        // check right direction
+        stopCell = (cursor[1] > 0) ? cell[cursor[0]][cursor[1]-1] : 0;
+        if ((cursor[1] > 0 && thisCell <= 2 && stopCell > 2) || (thisCell == 3 || thisCell == 4)) {
             i = cursor[1] + 1;
-            while(i < 16) {
+            while (i < 16) {
                 if(cell[cursor[0]][i] > 2) break;
                 i++;
             }
-            if(i == 16) {
-                aimDirection = (thisCell <= 2) ? Play.COMMAND_LEFT : Play.COMMAND_RIGHT;
+            if (i == 16) {
+                aimDirection = (thisCell <= 2) ? PlayScene.COMMAND_LEFT : PlayScene.COMMAND_RIGHT;
                 return;
             }
         }
         
-        //kiểm tra theo hướng xuống dưới
-        if(cursor[0] > 0) stopCell = cell[cursor[0]-1][cursor[1]];
-        else stopCell = 0;
-        if((cursor[0] > 0 && thisCell <= 2 && stopCell > 2) || (thisCell == 3 || thisCell == 4)) {
+        // check down direction
+        stopCell = (cursor[0] > 0) ? cell[cursor[0]-1][cursor[1]] : 0;
+        if ((cursor[0] > 0 && thisCell <= 2 && stopCell > 2) || (thisCell == 3 || thisCell == 4)) {
             i = cursor[0] + 1;
-            while(i < 16) {
-                if(cell[i][cursor[1]] > 2) break;
+            while (i < 16) {
+                if (cell[i][cursor[1]] > 2)
+                    break;
                 i++;
             }
-            if(i == 16) {
-                aimDirection = (thisCell <= 2) ? Play.COMMAND_UP : Play.COMMAND_DOWN;
+            if (i == 16) {
+                aimDirection = (thisCell <= 2) ? PlayScene.COMMAND_UP : PlayScene.COMMAND_DOWN;
+                return;
             }
         }
         
-        //kiểm tra theo hướng sang trái
-        if(cursor[1] < 15) stopCell = cell[cursor[0]][cursor[1]+1];
-        else stopCell = 0;
-        if((cursor[1] < 15 && thisCell <= 2 && stopCell > 2) || (thisCell == 3 || thisCell == 4)) {
+        // check left direction
+        stopCell = (cursor[1] < 15) ? cell[cursor[0]][cursor[1]+1] : 0;
+        if ((cursor[1] < 15 && thisCell <= 2 && stopCell > 2) || (thisCell == 3 || thisCell == 4)) {
             i = cursor[1] - 1;
-            while(i > -1) {
-                if(cell[cursor[0]][i] > 2) break;
+            while (i > -1) {
+                if (cell[cursor[0]][i] > 2)
+                    break;
                 i--;
             }
-            if(i == -1) {
-                aimDirection = (thisCell <= 2) ? Play.COMMAND_RIGHT : Play.COMMAND_LEFT;
-                return;
+            if (i == -1) {
+                aimDirection = (thisCell <= 2) ? PlayScene.COMMAND_RIGHT : PlayScene.COMMAND_LEFT;
             }
         }
     }

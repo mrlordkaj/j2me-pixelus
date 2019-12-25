@@ -23,30 +23,28 @@ package util;
 public class StringHelper {
     public static String[] split(String sb, String splitter) {
         String[] strs = new String[sb.length()];
-        int splitterLength = splitter.length();
-        int initialIndex = 0;
-        int indexOfSplitter = sb.indexOf(splitter, initialIndex);
+        int splitLength = splitter.length();
+        int initPos = 0;
+        int splitPos = sb.indexOf(splitter, initPos);
         int count = 0;
-        if (-1 == indexOfSplitter) {
-            return new String[]{sb.toString()};
+        if (-1 == splitPos) {
+            return new String[]{ sb };
         }
-        while (-1 != indexOfSplitter) {
-            char[] chars = new char[indexOfSplitter - initialIndex];
-            sb.getChars(initialIndex, indexOfSplitter, chars, 0);
-            initialIndex = indexOfSplitter + splitterLength;
-            indexOfSplitter = sb.indexOf(splitter, indexOfSplitter + 1);
-            strs[count] = new String(chars);
-            count++;
+        while (-1 != splitPos) {
+            char[] chars = new char[splitPos - initPos];
+            sb.getChars(initPos, splitPos, chars, 0);
+            initPos = splitPos + splitLength;
+            splitPos = sb.indexOf(splitter, splitPos + 1);
+            strs[count++] = new String(chars);
         }
-        // get the remaining chars.
-        if (initialIndex + splitterLength <= sb.length()) {
-            char[] chars = new char[sb.length() - initialIndex];
-            sb.getChars(initialIndex, sb.length(), chars, 0);
-            strs[count] = new String(chars);
-            count++;
+        // get the remaining chars
+        if (initPos + splitLength <= sb.length()) {
+            char[] chars = new char[sb.length() - initPos];
+            sb.getChars(initPos, sb.length(), chars, 0);
+            strs[count++] = new String(chars);
         }
-        String[] result = new String[count];
-        System.arraycopy(strs, 0, result, 0, count);
-        return result;
+        String[] rs = new String[count];
+        System.arraycopy(strs, 0, rs, 0, count);
+        return rs;
     }
 }

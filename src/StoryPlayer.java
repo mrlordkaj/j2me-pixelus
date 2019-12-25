@@ -20,6 +20,6 @@
  * @author Thinh Pham
  */
 public interface StoryPlayer {
-    public void closeStory();
-    public String getPlayerName();
+    void closeStory();
+    String getPlayerName();
 }

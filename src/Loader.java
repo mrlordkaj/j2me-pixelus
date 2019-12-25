@@ -20,7 +20,7 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.Sprite;
 import util.GraphicButton;
-import util.IOHelper;
+import util.DataHelper;
 import util.ImageHelper;
 
 /**
@@ -28,274 +28,325 @@ import util.ImageHelper;
  * @author Thinh Pham
  */
 public class Loader extends Thread {
-    private GamePage parent;
     
-    public Loader(GamePage _parent) {
-        parent = _parent;
+    private final GameScene parent;
+    
+    public Loader(GameScene parent) {
+        this.parent = parent;
     }
     
     public void run() {
-        String parentClass = parent.getClass().getName();
-        if(parentClass.equals(IslandMap.class.getName())) {
-            loadIslandMapResource();
-        } else if(parentClass.equals(Temple.class.getName())) {
-            loadTempleResource();
-        } else if(parentClass.equals(Play.class.getName())) {
-            loadPlayResource();
+        if (parent instanceof IslandScene) {
+            loadIslandMapResource((IslandScene) parent);
+        }
+        else if (parent instanceof TempleScene) {
+            loadTempleResource((TempleScene) parent);
+        }
+        else if (parent instanceof PlayScene) {
+            loadPlayResource((PlayScene) parent);
         }
         parent.isLoading = false;
     }
     
-    private void loadIslandMapResource() {
-        ((IslandMap)parent).islandImage = Image.createImage(Main.SCREENSIZE_WIDTH, Main.SCREENSIZE_HEIGHT);
-        Graphics g = ((IslandMap)parent).islandImage.getGraphics();
+    private void loadIslandMapResource(IslandScene map) {
+        map.islandImage = Image.createImage(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
+        Graphics g = map.islandImage.getGraphics();
         g.drawImage(ImageHelper.loadImage("/images/islandmap.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
-        ImageHelper.medalSprite.setFrame(0);
-        for(int i = 0; i < ((IslandMap)parent).totalOpenedTemple; i++) {
-            if(((IslandMap)parent).getTempleCompleted(i)) {
-                //vẽ đền phát sáng
-                g.drawImage(ImageHelper.loadImage("/images/map" + Story.characterName[i].toLowerCase() + "b.png"), IslandMap.templeRectangle[i][0], IslandMap.templeRectangle[i][1], Graphics.LEFT | Graphics.TOP);
-                //vẽ huy chương cho đền hoàn hảo
-                if(((IslandMap)parent).templeIsPerfect(i)) {
-                    ImageHelper.medalSprite.setPosition(IslandMap.templeRectangle[i][0] + IslandMap.templeRectangle[i][2] / 2, IslandMap.templeRectangle[i][1] + IslandMap.templeRectangle[i][3] - 12);
-                    ImageHelper.medalSprite.paint(g);
+        ImageHelper.MEDAL_SPRITE.setFrame(0);
+        for (int i = 0; i < map.totalOpenedTemple; i++) {
+            if (map.getTempleCompleted(i)) {
+                // draw lighted temple
+                g.drawImage(ImageHelper.loadImage("/images/map" + Story.CHARACTER_NAMES[i].toLowerCase() + "b.png"), IslandScene.TEMPLE_RECTANGLE[i][0], IslandScene.TEMPLE_RECTANGLE[i][1], Graphics.LEFT | Graphics.TOP);
+                // draw medal to perfect
+                if (map.templeIsPerfect(i)) {
+                    ImageHelper.MEDAL_SPRITE.setPosition(IslandScene.TEMPLE_RECTANGLE[i][0] + IslandScene.TEMPLE_RECTANGLE[i][2] / 2, IslandScene.TEMPLE_RECTANGLE[i][1] + IslandScene.TEMPLE_RECTANGLE[i][3] - 12);
+                    ImageHelper.MEDAL_SPRITE.paint(g);
                 }
-            } else if(i != 0) {
-                //vẽ đền bình thường
-                g.drawImage(ImageHelper.loadImage("/images/map" + Story.characterName[i].toLowerCase() + "a.png"), IslandMap.templeRectangle[i][0], IslandMap.templeRectangle[i][1], Graphics.LEFT | Graphics.TOP);
+            }
+            else if (i != 0) {
+                // draw normal temple
+                g.drawImage(ImageHelper.loadImage("/images/map" + Story.CHARACTER_NAMES[i].toLowerCase() + "a.png"), IslandScene.TEMPLE_RECTANGLE[i][0], IslandScene.TEMPLE_RECTANGLE[i][1], Graphics.LEFT | Graphics.TOP);
             }
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ex) {}
         }
         
-        ((IslandMap)parent).lightingImage = ImageHelper.loadImage("/images/lighting.png");
-        ((IslandMap)parent).templeArrowImage = ImageHelper.loadImage("/images/templearrow.png");
-        ((IslandMap)parent).starSprite = new Sprite(ImageHelper.loadImage("/images/star.png"), 100, 16);
-        ((IslandMap)parent).starSprite.setPosition(25, 168);
-        if(((IslandMap)parent).newTemple == 0) {
-            ((IslandMap)parent).story = Story.getStory(Story.STORY_CYLOP_CYLOP, (IslandMap)parent);
+        map.lightingImage = ImageHelper.loadImage("/images/lighting.png");
+        map.templeArrowImage = ImageHelper.loadImage("/images/templearrow.png");
+        map.starSprite = new Sprite(ImageHelper.loadImage("/images/star.png"), 100, 16);
+        map.starSprite.setPosition(25, 168);
+        if (map.newTemple == 0) {
+            map.story = Story.getStory(Story.STORY_CYLOP_CYLOP, map);
         }
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {}
     }
     
-    private void loadTempleResource() {
+//#if ScreenWidth == 400
+//#     private static final int PUZZLE_IMAGE_SIZE = 68;
+//#     private static final int IMAGE_PIXEL_SIZE = 4;
+//#elif ScreenWidth == 320
+    private static final int PUZZLE_IMAGE_SIZE = 53;
+    private static final int IMAGE_PIXEL_SIZE = 3;
+//#endif
+    
+    private void loadTempleResource(TempleScene temple) {
         Image lockImage = ImageHelper.loadImage("/images/lockpuzzleoverlay.png");
-        Image pixelMask = ImageHelper.createPixelMask(4);
+        Image pixelMask = ImageHelper.createPixelMask(IMAGE_PIXEL_SIZE);
         
-        //vẽ danh sách puzzle
-        int templeId = ((Temple)parent).getTempleId();
+        // draw puzzle list
+        int templeId = temple.getTempleId();
         int numPuzzle = Puzzle.PUZZLE_FIRSTID[templeId + 1] - Puzzle.PUZZLE_FIRSTID[templeId];
-        int width = 68 * 3 - 4;
-        int height = ((Temple)parent).getPuzzleViewHeight();
-        ((Temple)parent).puzzleViewImage = Image.createImage(width, height);
-        Graphics g = ((Temple)parent).puzzleViewImage.getGraphics();
-        if(((Temple)parent).getTempleId() == Temple.TEMPLE_CYLOP) {
-            //nếu là tutorial
+        int width = PUZZLE_IMAGE_SIZE * 3 - 4;
+        int height = temple.getPuzzleViewHeight();
+        temple.puzzleViewImage = Image.createImage(width, height);
+        Graphics g = temple.puzzleViewImage.getGraphics();
+        if (temple.getTempleId() == TempleScene.TEMPLE_CYLOP) {
+            // if tutorial temple
             g.setColor(0x585866);
             g.fillRect(0, 0, width, height);
-            for(int i = 1; i <= numPuzzle; i++) {
-                int row = (i - 1) / 3;
-                int col = (i - 1) % 3;
-                if(i <= ((Temple)parent).getSolvedPuzzle()) {
-                    drawPuzzleImage(i, col * 68, row * 68, 4, g, pixelMask, Puzzle.MEDAL_NONE);
-                } else {
-                    drawPuzzleCover(i, col * 68, row * 68, g, pixelMask, Puzzle.MEDAL_NONE);
+            for (int i = 1; i <= numPuzzle; i++) {
+                int y = ((i - 1) / 3) * PUZZLE_IMAGE_SIZE;
+                int x = ((i - 1) % 3) * PUZZLE_IMAGE_SIZE;
+                if (i <= temple.getSolvedPuzzle()) {
+                    drawPuzzleImage(i, x, y, IMAGE_PIXEL_SIZE, g, pixelMask, Puzzle.MEDAL_NONE);
                 }
-                if(i > ((Temple)parent).getSolvedPuzzle() + 1) {
-                    g.drawImage(lockImage, col * 68, row * 68, Graphics.LEFT | Graphics.TOP);
+                else {
+                    drawPuzzleCover(i, x, y, IMAGE_PIXEL_SIZE, g, pixelMask, Puzzle.MEDAL_NONE);
+                }
+                if (i > temple.getSolvedPuzzle() + 1) {
+                    g.drawImage(lockImage, x, y, Graphics.LEFT | Graphics.TOP);
                 }
                 try {
                     Thread.sleep(10);
-                } catch (InterruptedException ex) {}
+                }
+                catch (InterruptedException ex) { }
             }
-        } else {
-            //nếu là các đền bình thường
+        }
+        else {
+            // if normal temples
             g.setColor(0xdda513);
             g.fillRect(0, 0, width, height);
-            for(int i = 0; i < numPuzzle; i++) {
-                int row = i / 3;
-                int col = i % 3;
-                if(((Temple)parent).bestAmountTurn(i) > 0) {
-                    drawPuzzleImage(i + Puzzle.PUZZLE_FIRSTID[templeId], col * 68, row * 68, 4, g, pixelMask, ((Temple)parent).medal(i));
+            for (int i = 0; i < numPuzzle; i++) {
+                int y = (i / 3) * PUZZLE_IMAGE_SIZE;
+                int x = (i % 3) * PUZZLE_IMAGE_SIZE;
+                if (temple.bestAmountTurn(i) > 0) {
+                    drawPuzzleImage(i + Puzzle.PUZZLE_FIRSTID[templeId], x, y, IMAGE_PIXEL_SIZE, g, pixelMask, temple.medal(i));
                 } else {
-                    drawPuzzleCover(i + Puzzle.PUZZLE_FIRSTID[templeId], col * 68, row * 68, g, pixelMask, ((Temple)parent).medal(i));
+                    drawPuzzleCover(i + Puzzle.PUZZLE_FIRSTID[templeId], x, y, IMAGE_PIXEL_SIZE, g, pixelMask, temple.medal(i));
                 }
                 try {
                     Thread.sleep(10);
-                } catch (InterruptedException ex) {}
+                }
+                catch (InterruptedException ex) { }
             }
-            if(!((Temple)parent).lastPuzzleIsUnlocked()) {
+            if (!temple.lastPuzzleIsUnlocked()) {
                 g.drawImage(lockImage, width, height, Graphics.RIGHT | Graphics.BOTTOM);
             }
         }
-        //các resource còn lại
-        ((Temple)parent).backgroundImage = ImageHelper.loadImage("/images/temple" + Story.characterName[((Temple)parent).getTempleId()].toLowerCase() + ".png");
-        ((Temple)parent).buttonImage = ImageHelper.loadImage("/images/buttongold.png");
-        ((Temple)parent).scrollerImage = ImageHelper.loadImage("/images/scroller.png");
+        // remaining temples
+        temple.backgroundImage = ImageHelper.loadImage("/images/temple" + Story.CHARACTER_NAMES[((TempleScene)parent).getTempleId()].toLowerCase() + ".png");
+        temple.buttonImage = ImageHelper.loadImage("/images/buttongold.png");
+        temple.scrollerImage = ImageHelper.loadImage("/images/scroller.png");
         
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {}
         
-        ((Temple)parent).schedule = 40;
+        temple.framePeriod = 40;
     }
     
-    private void loadPlayResource() {
-        ((Play)parent).tileSprite = new Sprite(ImageHelper.loadImage("/images/tile.png"), 12, 12);
-        ((Play)parent).viewpotImage = Image.createImage(252, 240);
-        ((Play)parent).viewpotGraphic = ((Play)parent).viewpotImage.getGraphics();
-        ((Play)parent).viewpotGraphic.drawImage(ImageHelper.loadImage("/images/playbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
-        int puzzleId = ((Play)parent).getPuzzleId();
+    private void loadPlayResource(PlayScene play) {
+        play.tileSprite = new Sprite(ImageHelper.loadImage("/images/tile.png"), 12, 12);
+        play.viewpotImage = Image.createImage(252, 240);
+        play.viewpotGraphic = play.viewpotImage.getGraphics();
+        play.viewpotGraphic.drawImage(ImageHelper.loadImage("/images/playbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
+        int puzzleId = play.getPuzzleId();
         Puzzle myPuzzle = Puzzle.getPuzzle(puzzleId);
-        ((Play)parent).puzzleTitle = myPuzzle.getTitle();
+        play.puzzleTitle = myPuzzle.getTitle();
         String data = myPuzzle.getData();
         String name = myPuzzle.getName();
         String title = myPuzzle.getTitle();
-        myPuzzle = null;
         int row, col;
         byte value, tileRemain = 0, totalTile = 0;
-        for(short i = 0; i < 16*16; i++) {
+        for (short i = 0; i < 16*16; i++) {
             row = i / 16;
             col = i % 16;
-            value = (byte)data.charAt(i);
-            ((Play)parent).tileSprite.setFrame(value);
-            ((Play)parent).tileSprite.setPosition(col * 12 + 24, row * 12 + 24);
-            ((Play)parent).tileSprite.paint(((Play)parent).viewpotGraphic);
-            ((Play)parent).cell[row][col] = ((Play)parent).defaultData[row][col] = value;
-            switch(value) {
-                case Play.TILE_WANT:
-                case Play.TILE_STICKY:
+            value = (byte) data.charAt(i);
+            play.tileSprite.setFrame(value);
+            play.tileSprite.setPosition(col * 12 + 24, row * 12 + 24);
+            play.tileSprite.paint(play.viewpotGraphic);
+            play.cell[row][col] = play.defaultData[row][col] = value;
+            switch (value) {
+                case PlayScene.TILE_WANT:
+                case PlayScene.TILE_STICKY:
                     tileRemain++;
                     totalTile++;
                     break;
                     
-                case Play.TILE_BLUE:
+                case PlayScene.TILE_BLUE:
                     totalTile++;
                     break;
                     
-                case Play.TILE_RED:
+                case PlayScene.TILE_RED:
                     tileRemain--;
                     break;
             }
         }
-        data = null;
         //if(((Play)parent).getTempleId() != Temple.TEMPLE_CYLOP) ((Play)parent).worldRecord = IOHelper.getFileSize("/data/hints/" + name + ".dat");
-        if(((Play)parent).getTempleId() != Temple.TEMPLE_CYLOP) ((Play)parent).hintData = IOHelper.read("/data/hints/" + name + ".dat");
+        if (play.getTempleId() != TempleScene.TEMPLE_CYLOP)
+            play.hintData = DataHelper.readFile("/data/hints/" + name + ".dat");
         
-        Image resourceImage = ImageHelper.loadImage("/data/images/" + name + ".gif");
-        resourceImage.getRGB(((Play)parent).rgb, 0, 16, 0, 0, 16, 16);
+        ImageHelper.loadImage("/data/images/" + name + ".gif")
+                .getRGB(play.rgb, 0, 16, 0, 0, 16, 16);
         
         int stackHeight = 12 * totalTile;
-        ((Play)parent).stackImage = Image.createImage(12, stackHeight);
-        Graphics g = ((Play)parent).stackImage.getGraphics();
-        ((Play)parent).tileSprite.setFrame(Play.TILE_BLUE);
-        for(int i = stackHeight - 12; i >= 0; i -= 12) {
-            ((Play)parent).tileSprite.setPosition(0, i);
-            ((Play)parent).tileSprite.paint(g);
+        play.stackImage = Image.createImage(12, stackHeight);
+        Graphics g = play.stackImage.getGraphics();
+        play.tileSprite.setFrame(PlayScene.TILE_BLUE);
+        for (int i = stackHeight - 12; i >= 0; i -= 12) {
+            play.tileSprite.setPosition(0, i);
+            play.tileSprite.paint(g);
         }
-        ((Play)parent).tileStackY = 240 - 12 * tileRemain;
+        play.tileStackY = 240 - 12 * tileRemain;
         
         int[] rgb = new int[12*12];
-        for (int i = 0; i < rgb.length; ++i) rgb[i] = 0x44ffffff;
-        ((Play)parent).posibleMask = Image.createRGBImage(rgb, 12, 12, true);
-        for (int i = 0; i < rgb.length; ++i) rgb[i] = 0x22ff0000;
-        ((Play)parent).imposibleMask = Image.createRGBImage(rgb, 12, 12, true);
-        rgb = null;
+        for (int i = 0; i < rgb.length; ++i) {
+            rgb[i] = 0x44ffffff;
+        }
+        play.possibleMask = Image.createRGBImage(rgb, 12, 12, true);
+        for (int i = 0; i < rgb.length; ++i) {
+            rgb[i] = 0x22ff0000;
+        }
+        play.imposibleMask = Image.createRGBImage(rgb, 12, 12, true);
         
-        ((Play)parent).puzzleCompleteImage = Image.createImage(Main.SCREENSIZE_WIDTH, Main.SCREENSIZE_HEIGHT);
-        g = ((Play)parent).puzzleCompleteImage.getGraphics();
+//#if ScreenWidth == 400
+//#         play.puzzleCompleteImage = Image.createImage(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
+//#         g = play.puzzleCompleteImage.getGraphics();
+//#         g.drawImage(ImageHelper.loadImage("/images/puzzlecompleted.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
+//#         drawPuzzleImage(puzzleId, 161, 50, 5, g, ImageHelper.createPixelMask(5), 3);
+//#         g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+//#         g.setColor(0x000000);
+//#         g.drawString(title, Main.SCREEN_WIDTH / 2 + 1, 148 + 1, Graphics.HCENTER | Graphics.BASELINE);
+//#         g.setColor(0xffd800);
+//#         g.drawString(title, Main.SCREEN_WIDTH / 2, 148, Graphics.HCENTER | Graphics.BASELINE);
+//#         
+//#         Image gamepadImage = ImageHelper.loadImage("/images/navbutton.png");
+//#         play.button = new GraphicButton[] {
+//#             new GraphicButton(gamepadImage, PlayScene.COMMAND_UP, 308, 131, 40, 30),
+//#             new GraphicButton(gamepadImage, PlayScene.COMMAND_RIGHT, 350, 164, 40, 30),
+//#             new GraphicButton(gamepadImage, PlayScene.COMMAND_DOWN, 308, 197, 40, 30),
+//#             new GraphicButton(gamepadImage, PlayScene.COMMAND_LEFT, 266, 164, 40, 30),
+//#             new GraphicButton(gamepadImage, PlayScene.COMMAND_FIRE, 308, 164, 40, 30)
+//#         };
+//#         
+//#         play.sidebarImage = Image.createImage(148, 240);
+//#         g = play.sidebarImage.getGraphics();
+//#         g.drawImage(ImageHelper.loadImage("/images/sidebarbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
+//#         if (play.getTempleId() == TempleScene.TEMPLE_CYLOP) {
+//#             g.drawImage(ImageHelper.loadImage("/images/tutorialsidebar.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
+//#             g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+//#             String[] description = Tutorial.getDescription(play.getPuzzleId());
+//#             for (int i = 0; i < description.length; i++) {
+//#                 g.drawString(description[i], 75, 14*i + 24, Graphics.HCENTER | Graphics.BASELINE);
+//#             }
+//#         } else {
+//#             g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+//#             g.setColor(0xff0000);
+//#             g.drawString(Integer.toString(play.hintData.length()), 126, 82, Graphics.RIGHT | Graphics.BASELINE);
+//#         }
+//#elif ScreenWidth == 320
+        play.puzzleCompleteImage = Image.createImage(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
+        g = play.puzzleCompleteImage.getGraphics();
         g.drawImage(ImageHelper.loadImage("/images/puzzlecompleted.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
-        drawPuzzleImage(puzzleId, 161, 50, 5, g, ImageHelper.createPixelMask(5), 3);
+        drawPuzzleImage(puzzleId, 128, 48, 4, g, ImageHelper.createPixelMask(4), 3);
         g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
         g.setColor(0x000000);
-        g.drawString(title, Main.SCREENSIZE_WIDTH / 2 + 1, 148 + 1, Graphics.HCENTER | Graphics.BASELINE);
+        g.drawString(title, Main.SCREEN_WIDTH / 2 + 1, 130 + 1, Graphics.HCENTER | Graphics.BASELINE);
         g.setColor(0xffd800);
-        g.drawString(title, Main.SCREENSIZE_WIDTH / 2, 148, Graphics.HCENTER | Graphics.BASELINE);
+        g.drawString(title, Main.SCREEN_WIDTH / 2, 130, Graphics.HCENTER | Graphics.BASELINE);
         
-        Image gamepadImage = ImageHelper.loadImage("/images/navbutton.png");
-        ((Play)parent).button = new GraphicButton[] {
-            new GraphicButton(gamepadImage, Play.COMMAND_UP, 308, 131, 40, 30),
-            new GraphicButton(gamepadImage, Play.COMMAND_RIGHT, 350, 164, 40, 30),
-            new GraphicButton(gamepadImage, Play.COMMAND_DOWN, 308, 197, 40, 30),
-            new GraphicButton(gamepadImage, Play.COMMAND_LEFT, 266, 164, 40, 30),
-            new GraphicButton(gamepadImage, Play.COMMAND_FIRE, 308, 164, 40, 30)
-        };
-        gamepadImage = null;
-        
-        ((Play)parent).sidebarImage = Image.createImage(148, 240);
-        g = ((Play)parent).sidebarImage.getGraphics();
-        g.drawImage(ImageHelper.loadImage("/images/sidebarbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
-        if(((Play)parent).getTempleId() == Temple.TEMPLE_CYLOP) {
+        play.sidebarImage = Image.createImage(68, 240);
+        g = play.sidebarImage.getGraphics();
+        if (play.getTempleId() == TempleScene.TEMPLE_CYLOP) {
             g.drawImage(ImageHelper.loadImage("/images/tutorialsidebar.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
             g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
-            String[] description = Tutorial.getDescription(((Play)parent).getPuzzleId());
-            for(int i = 0; i < description.length; i++) {
-                g.drawString(description[i], 75, 14*i + 24, Graphics.HCENTER | Graphics.BASELINE);
+            String[] description = Tutorial.getDescription(play.getPuzzleId());
+            for (int i = 0; i < description.length; i++) {
+                g.drawString(description[i], 34, 14*i + 18, Graphics.HCENTER | Graphics.BASELINE);
             }
         } else {
+            g.drawImage(ImageHelper.loadImage("/images/sidebarbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
             g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
-            g.setColor(0xff0000);
-            g.drawString(Integer.toString(((Play)parent).hintData.length()), 126, 82, Graphics.RIGHT | Graphics.BASELINE);
+            g.setColor(0x00ff00);
+            g.drawString(Integer.toString(play.hintData.length()), 32, 94, Graphics.HCENTER | Graphics.BASELINE);
         }
+//#endif
         
-        ((Play)parent).characterSprite = new Sprite(ImageHelper.loadImage("/images/tilemaster.png"), 20, 26);
-        ((Play)parent).characterSprite.setPosition(20, -2);
+        play.characterSprite = new Sprite(ImageHelper.loadImage("/images/tilemaster.png"), 20, 26);
+        play.characterSprite.setPosition(20, -2);
         
-        ((Play)parent).aimImage = new Image[] {
+        play.aimImage = new Image[] {
             ImageHelper.loadImage("/images/aimup.png"),
             ImageHelper.loadImage("/images/aimright.png"),
             ImageHelper.loadImage("/images/aimdown.png"),
             ImageHelper.loadImage("/images/aimleft.png")
         };
-        ((Play)parent).navImage = ImageHelper.loadImage("/images/navigator.png");
-        ((Play)parent).shruggingSprite = new Sprite(ImageHelper.loadImage("/images/shrugging.png"), 20, 26);
-        ((Play)parent).celebratingSprite = new Sprite(ImageHelper.loadImage("/images/celebrating.png"), 20, 35);
-        ((Play)parent).cellMask = ImageHelper.loadImage("/images/cellmask.png");
-        ((Play)parent).curtainImage = ImageHelper.loadImage("/images/curtain.png");
-        ((Play)parent).quickMenuImage = ImageHelper.loadImage("/images/quickmenu.png");
-        ((Play)parent).calcPosible();
-        ((Play)parent).updateCharacterSprite();
+        play.navImage = ImageHelper.loadImage("/images/navigator.png");
+        play.shruggingSprite = new Sprite(ImageHelper.loadImage("/images/shrugging.png"), 20, 26);
+        play.celebratingSprite = new Sprite(ImageHelper.loadImage("/images/celebrating.png"), 20, 35);
+        play.cellMask = ImageHelper.loadImage("/images/cellmask.png");
+        play.curtainImage = ImageHelper.loadImage("/images/curtain.png");
+        play.quickMenuImage = ImageHelper.loadImage("/images/quickmenu.png");
+        play.calcPosible();
+        play.updateCharacterSprite();
         
-        if(((Play)parent).getTempleId() == Temple.TEMPLE_CYLOP) {
-            ((Play)parent).prepareTutorialStep();
+        if (play.getTempleId() == TempleScene.TEMPLE_CYLOP) {
+            play.prepareTutorialStep();
         }
         
         try {
             Thread.sleep(1000);
-        } catch (InterruptedException ex) {}
+        }
+        catch (InterruptedException ex) { }
     }
     
-    public static void drawPuzzleCover(int puzzleId, int x, int y, Graphics g, Image pixelMask, int medal) {
+//#if ScreenWidth == 400
+//#     private static final int MEDAL_SPRITE_TOP = 40;
+//#elif ScreenWidth == 320
+    private static final int MEDAL_SPRITE_TOP = 24;
+//#endif
+    
+    public static void drawPuzzleCover(int puzzleId, int x, int y, int pixelSize, Graphics g, Image pixelMask, int medal) {
         Puzzle puzzle = Puzzle.getPuzzle(puzzleId);
         String data = puzzle.getData();
-        for(short i = 0; i < 16*16; i++) {
+        for (short i = 0; i < 16*16; i++) {
             int row = i / 16;
             int col = i % 16;
-            switch(data.charAt(i)) {
-                case Play.TILE_NONE: //0
+            switch (data.charAt(i)) {
+                case PlayScene.TILE_NONE: //0
                     g.setColor(0xeabc6e);
                     break;
                     
-                case Play.TILE_WANT: //?
+                case PlayScene.TILE_WANT: //?
                     g.setColor(0xffe0b1);
                     break;
                     
-                case Play.TILE_STICKY: //S
+                case PlayScene.TILE_STICKY: //S
                     g.setColor(0x69db76);
                     break;
                     
-                case Play.TILE_BLUE: //+
+                case PlayScene.TILE_BLUE: //+
                     g.setColor(0x5df0e8);
                     break;
                     
-                case Play.TILE_RED: //-
+                case PlayScene.TILE_RED: //-
                     g.setColor(0xf95d5d);
                     break;
                     
-                case Play.TILE_DARKBLUE: //X
+                case PlayScene.TILE_DARKBLUE: //X
                     g.setColor(0x228aa2);
                     break;
                     
@@ -303,97 +354,84 @@ public class Loader extends Thread {
                     g.setColor(0x000000);
                     break;
             }
-            g.fillRect(col * 4 + x, row * 4 + y, 4, 4);
+            g.fillRect(col * pixelSize + x, row * pixelSize + y, pixelSize, pixelSize);
         }
-        data = null;
         g.drawImage(pixelMask, x, y, Graphics.LEFT | Graphics.TOP);
-        if(medal < Puzzle.MEDAL_NONE) {
-            ImageHelper.medalSprite.setFrame(medal);
-            ImageHelper.medalSprite.setPosition(x, y + 40);
-            ImageHelper.medalSprite.paint(g);
+        if (medal < Puzzle.MEDAL_NONE) {
+            ImageHelper.MEDAL_SPRITE.setFrame(medal);
+            ImageHelper.MEDAL_SPRITE.setPosition(x, y + MEDAL_SPRITE_TOP);
+            ImageHelper.MEDAL_SPRITE.paint(g);
         }
     }
     
-    public static void drawPuzzleImage(int puzzleId, int x, int y, int size, Graphics g, Image pixelMask, int medal) {
+    public static void drawPuzzleImage(int puzzleId, int x, int y, int pixelSize, Graphics g, Image pixelMask, int medal) {
         String name = Puzzle.getPuzzle(puzzleId).getName();
-        Image resourceImage = ImageHelper.loadImage("/data/images/" + name + ".gif");
-        
+        Image img = ImageHelper.loadImage("/data/images/" + name + ".gif");
         int[] rgb = new int[16*16];
-        resourceImage.getRGB(rgb, 0, 16, 0, 0, 16, 16);
-        for(int i = 0; i < rgb.length; ++i) {
+        img.getRGB(rgb, 0, 16, 0, 0, 16, 16);
+        for (int i = 0; i < rgb.length; ++i) {
             int row = i / 16;
             int col = i % 16;
             g.setColor(rgb[i]);
-            g.fillRect(col * size + x, row * size + y, size, size);
+            g.fillRect(col * pixelSize + x, row * pixelSize + y, pixelSize, pixelSize);
         }
         g.drawImage(pixelMask, x, y, Graphics.LEFT | Graphics.TOP);
-        if(medal < Puzzle.MEDAL_NONE) {
-            ImageHelper.medalSprite.setFrame(medal);
-            ImageHelper.medalSprite.setPosition(x, y + 40);
-            ImageHelper.medalSprite.paint(g);
+        if (medal < Puzzle.MEDAL_NONE) {
+            ImageHelper.MEDAL_SPRITE.setFrame(medal);
+            ImageHelper.MEDAL_SPRITE.setPosition(x, y + MEDAL_SPRITE_TOP);
+            ImageHelper.MEDAL_SPRITE.paint(g);
         }
     }
     
+    private static final int DIALOG_WIDTH = 252;
+    private static final int DIALOG_HEIGHT = 182;
+    
     public static Image confirmDialog(String[] message){
-        final int WIDTH = 252;
-        final int HEIGHT = 182;
-        Image dialog = Image.createImage(WIDTH, HEIGHT);
+        Image dialog = Image.createImage(DIALOG_WIDTH, DIALOG_HEIGHT);
         Graphics g = dialog.getGraphics();
-        
-        //vẽ bảng thông báo
+        // draw dialog
         g.drawImage(ImageHelper.loadImage("/images/dialog.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
-        
-        //viết nội dung thông báo
+        // draw content
         g.setColor(0, 0, 0);
-        for(int i = 0; i < message.length; i++) {
-            g.drawString(message[i], WIDTH / 2, 57 + i * 20, Graphics.HCENTER | Graphics.BASELINE);
+        for (int i = 0; i < message.length; i++) {
+            g.drawString(message[i], DIALOG_WIDTH / 2, 57 + i * 20, Graphics.HCENTER | Graphics.BASELINE);
         }
-        
-        //nút okie
+        // draw okie button
         g.drawImage(ImageHelper.loadImage("/images/buttongold.png"), 84, 140, Graphics.HCENTER | Graphics.VCENTER);
         g.drawString("Okie", 84, 146, Graphics.HCENTER | Graphics.BASELINE);
-        //nút cancel
-        g.drawImage(ImageHelper.loadImage("/images/buttonsilver.png"), WIDTH - 84, 140, Graphics.HCENTER | Graphics.VCENTER);
-        g.drawString("Cancel", WIDTH - 84, 146, Graphics.HCENTER | Graphics.BASELINE);
-        
-        //xóa nền rồi trả về hình ảnh
-        int[] rgb = new int[WIDTH * HEIGHT];
-        dialog.getRGB(rgb, 0, WIDTH, 0, 0, WIDTH, HEIGHT);
+        // draw cancel button
+        g.drawImage(ImageHelper.loadImage("/images/buttonsilver.png"), DIALOG_WIDTH - 84, 140, Graphics.HCENTER | Graphics.VCENTER);
+        g.drawString("Cancel", DIALOG_WIDTH - 84, 146, Graphics.HCENTER | Graphics.BASELINE);
+        // erase background
+        int[] rgb = new int[DIALOG_WIDTH * DIALOG_HEIGHT];
+        dialog.getRGB(rgb, 0, DIALOG_WIDTH, 0, 0, DIALOG_WIDTH, DIALOG_HEIGHT);
         for (int i = 0; i < rgb.length; ++i) {
-            if (rgb[i] == 0xffff00ff) {
+            if (rgb[i] == 0xffff00ff)
                 rgb[i] &= 0x00ffffff;
-            }
         }
-        return Image.createRGBImage(rgb, WIDTH, HEIGHT, true);
+        return Image.createRGBImage(rgb, DIALOG_WIDTH, DIALOG_HEIGHT, true);
     }
     
     public static Image messageDialog(String[] message){
-        final int WIDTH = 252;
-        final int HEIGHT = 182;
-        Image dialog = Image.createImage(WIDTH, HEIGHT);
+        Image dialog = Image.createImage(DIALOG_WIDTH, DIALOG_HEIGHT);
         Graphics g = dialog.getGraphics();
-        
-        //vẽ bảng thông báo
+        // draw dialog
         g.drawImage(ImageHelper.loadImage("/images/dialog.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
-        
-        //viết nội dung thông báo
+        // draw content
         g.setColor(0, 0, 0);
-        for(int i = 0; i < message.length; i++) {
-            g.drawString(message[i], WIDTH / 2, 57 + i * 20, Graphics.HCENTER | Graphics.BASELINE);
+        for (int i = 0; i < message.length; i++) {
+            g.drawString(message[i], DIALOG_WIDTH / 2, 57 + i * 20, Graphics.HCENTER | Graphics.BASELINE);
         }
-        
-        //nút okie
-        g.drawImage(ImageHelper.loadImage("/images/buttongold.png"), WIDTH / 2, 140, Graphics.HCENTER | Graphics.VCENTER);
-        g.drawString("Okie", WIDTH / 2, 146, Graphics.HCENTER | Graphics.BASELINE);
-        
-        //xóa nền rồi trả về hình ảnh
-        int[] rgb = new int[WIDTH * HEIGHT];
-        dialog.getRGB(rgb, 0, WIDTH, 0, 0, WIDTH, HEIGHT);
+        // draw okie button
+        g.drawImage(ImageHelper.loadImage("/images/buttongold.png"), DIALOG_WIDTH / 2, 140, Graphics.HCENTER | Graphics.VCENTER);
+        g.drawString("Okie", DIALOG_WIDTH / 2, 146, Graphics.HCENTER | Graphics.BASELINE);
+        // erase background
+        int[] rgb = new int[DIALOG_WIDTH * DIALOG_HEIGHT];
+        dialog.getRGB(rgb, 0, DIALOG_WIDTH, 0, 0, DIALOG_WIDTH, DIALOG_HEIGHT);
         for (int i = 0; i < rgb.length; ++i) {
-            if (rgb[i] == 0xffff00ff) {
+            if (rgb[i] == 0xffff00ff)
                 rgb[i] &= 0x00ffffff;
-            }
         }
-        return Image.createRGBImage(rgb, WIDTH, HEIGHT, true);
+        return Image.createRGBImage(rgb, DIALOG_WIDTH, DIALOG_HEIGHT, true);
     }
 }

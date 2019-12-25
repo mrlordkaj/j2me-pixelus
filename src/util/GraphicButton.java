@@ -25,9 +25,10 @@ import javax.microedition.lcdui.game.Sprite;
  * @author Thinh Pham
  */
 public class GraphicButton {
-    private Sprite sprite;
-    private int x, y, width, height;
-    private byte cmd;
+    
+    private final Sprite sprite;
+    private final int x, y, width, height;
+    private final byte cmd;
     public int active = 0;
     
     public GraphicButton(String imagePath, byte _cmd, int _x, int _y, int _width, int _height) {
@@ -56,8 +57,7 @@ public class GraphicButton {
         sprite.paint(g);
     }
     
-    public boolean contains(int _x, int _y) {
-        if(_x > x && _x < x + width && _y > y && _y < y + height) return true;
-        return false;
+    public boolean contains(int x, int y) {
+        return (x > this.x && x < this.x + width && y > this.y && y < this.y + height);
     }
 }

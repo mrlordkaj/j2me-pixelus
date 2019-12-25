@@ -26,43 +26,35 @@ import javax.microedition.lcdui.game.Sprite;
  *
  * @author Thinh Pham
  */
-public class ImageHelper {
-    public static final Sprite medalSprite = new Sprite(ImageHelper.loadImage("/images/medal.png"), 24, 24);
+public abstract class ImageHelper {
+    
+    public static final Sprite MEDAL_SPRITE = new Sprite(ImageHelper.loadImage("/images/medal.png"), 24, 24);
 
     public static Image loadImage(String path) throws RuntimeException {
-        Image image = null;
-
         try {
-            InputStream in = Image.class.getResourceAsStream(path);
-            image = Image.createImage(in);
-        } catch (IOException ioe) {
-            throw new RuntimeException("ImageLoader failed to load image:" + path + " " + ioe.getMessage());
+            InputStream is = Image.class.getResourceAsStream(path);
+            return Image.createImage(is);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex.getMessage());
         }
-
-        return image;
     }
     
-    public static Image createPixelMask(int size) {
-        int imgSize = size*16;
+    public static Image createPixelMask(int pixelSize) {
+        int imgSize = pixelSize*16;
         Image mask = Image.createImage(imgSize, imgSize);
         Graphics g = mask.getGraphics();
         g.setColor(0, 0, 0);
-        for(int i = 1; i < 16; i++) {
-            //vẽ chiều ngang
-            g.drawLine(0, i*size, imgSize, i*size);
-            //vẽ chiều dọc
-            g.drawLine(i*size, 0, i*size, imgSize);
+        for (int i = 1; i < 16; i++) {
+            // draw horizontal
+            g.drawLine(0, i*pixelSize, imgSize, i*pixelSize);
+            // draw vertical
+            g.drawLine(i*pixelSize, 0, i*pixelSize, imgSize);
         }
         int[] rgb = new int[imgSize*imgSize];
         mask.getRGB(rgb, 0, imgSize, 0, 0, imgSize, imgSize);
         for (int i = 0; i < rgb.length; ++i) {
-            if (rgb[i] == 0xffffffff) {
-                rgb[i] &= 0x00ffffff;
-            } else {
-                rgb[i] &= 0x22000000;
-            }
+            rgb[i] &= (rgb[i] == 0xffffffff) ? 0x00ffffff : 0x22000000;
         }
-        mask = Image.createRGBImage(rgb, imgSize, imgSize, true);
-        return mask;
+        return Image.createRGBImage(rgb, imgSize, imgSize, true);
     }
 }

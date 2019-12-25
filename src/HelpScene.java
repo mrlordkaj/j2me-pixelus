@@ -77,7 +77,7 @@ public class HelpScene extends GameScene {
         start(80);
     }
     
-    private void prepareResource() {
+    final void prepareResource() {
         backgroundImage = ImageHelper.loadImage("/images/storybackground.png");
         titleImage = ImageHelper.loadImage("/images/helptitle.png");
         isLoading = false;

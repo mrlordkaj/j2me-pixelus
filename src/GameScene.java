@@ -32,6 +32,8 @@ public abstract class GameScene extends GameCanvas implements Runnable {
     public short framePeriod;
     protected boolean isPlaying;
     
+    abstract void prepareResource();
+    
     public GameScene() {
         super(false);
         setFullScreenMode(true);

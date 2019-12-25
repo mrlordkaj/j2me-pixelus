@@ -27,7 +27,7 @@ import util.StringHelper;
  *
  * @author Thinh Pham
  */
-public class TempleScene extends GameScene implements StoryPlayer {
+public class TempleScene extends LazyScene implements StoryPlayer {
     
     static final int TEMPLE_NONE = -1;
     static final int TEMPLE_CYLOP = 0;
@@ -66,8 +66,6 @@ public class TempleScene extends GameScene implements StoryPlayer {
     
     private int[] bestAmountTurn, bestAmountTime, medal;
     
-    private final Main parent;
-    
     public int getSolvedPuzzle() { return solvedPuzzle; }
     public boolean lastPuzzleIsUnlocked() { return lastPuzzleUnlocked; }
     public int getTempleId() { return templeId; }
@@ -81,22 +79,22 @@ public class TempleScene extends GameScene implements StoryPlayer {
     }
     
     public TempleScene(Main parent, int templeId, int marginTop) {
-        super();
-        this.parent = parent;
+        super(parent);
         this.templeId = templeId;
         this.marginTop = marginTop;
-        prepareResource();
         start(100);
     }
     
 //#if ScreenWidth == 400
-//#     private static final int PUZZLE_SIZE = 68;
+//#     private static final int PUZZLE_IMAGE_SIZE = 68;
+//#     private static final int IMAGE_PIXEL_SIZE = 4;
 //#elif ScreenWidth == 320
-    private static final int PUZZLE_SIZE = 53;
+    private static final int PUZZLE_IMAGE_SIZE = 53;
+    private static final int IMAGE_PIXEL_SIZE = 3;
 //#endif
     
-    private void prepareResource() {
-        puzzleViewHeight = ((Puzzle.PUZZLE_FIRSTID[templeId + 1] - Puzzle.PUZZLE_FIRSTID[templeId]) / 3) * PUZZLE_SIZE - 4;
+    void prepareResource() {
+        puzzleViewHeight = ((Puzzle.PUZZLE_FIRSTID[templeId + 1] - Puzzle.PUZZLE_FIRSTID[templeId]) / 3) * PUZZLE_IMAGE_SIZE - 4;
         try {
             RecordStore rs = RecordStore.openRecordStore(Main.RMS_USER, false);
             String[] templeData = StringHelper.split(new String(rs.getRecord(Main.RMS_USER_TEMPLESTATISTIC + templeId)), "#");
@@ -172,7 +170,58 @@ public class TempleScene extends GameScene implements StoryPlayer {
                 clearNotify();
                 break;
         }
-        new Loader(this).start();
+        
+        Image lockImage = ImageHelper.loadImage("/images/lockpuzzleoverlay.png");
+        Image pixelMask = ImageHelper.createPixelMask(IMAGE_PIXEL_SIZE);
+        
+        // draw puzzle list
+        int numPuzzle = Puzzle.PUZZLE_FIRSTID[templeId + 1] - Puzzle.PUZZLE_FIRSTID[templeId];
+        int width = PUZZLE_IMAGE_SIZE * 3 - 4;
+        int height = getPuzzleViewHeight();
+        puzzleViewImage = Image.createImage(width, height);
+        Graphics g = puzzleViewImage.getGraphics();
+        if (templeId == TempleScene.TEMPLE_CYLOP) {
+            // if tutorial temple
+            g.setColor(0x585866);
+            g.fillRect(0, 0, width, height);
+            for (int i = 1; i <= numPuzzle; i++) {
+                int y = ((i - 1) / 3) * PUZZLE_IMAGE_SIZE;
+                int x = ((i - 1) % 3) * PUZZLE_IMAGE_SIZE;
+                if (i <= getSolvedPuzzle()) {
+                    Loader.drawPuzzleImage(i, x, y, IMAGE_PIXEL_SIZE, g, pixelMask, Puzzle.MEDAL_NONE);
+                }
+                else {
+                    Loader.drawPuzzleCover(i, x, y, IMAGE_PIXEL_SIZE, g, pixelMask, Puzzle.MEDAL_NONE);
+                }
+                if (i > getSolvedPuzzle() + 1) {
+                    g.drawImage(lockImage, x, y, Graphics.LEFT | Graphics.TOP);
+                }
+                System.gc();
+            }
+        }
+        else {
+            // if normal temples
+            g.setColor(0xdda513);
+            g.fillRect(0, 0, width, height);
+            for (int i = 0; i < numPuzzle; i++) {
+                int y = (i / 3) * PUZZLE_IMAGE_SIZE;
+                int x = (i % 3) * PUZZLE_IMAGE_SIZE;
+                if (bestAmountTurn(i) > 0)
+                    Loader.drawPuzzleImage(i + Puzzle.PUZZLE_FIRSTID[templeId], x, y, IMAGE_PIXEL_SIZE, g, pixelMask, medal(i));
+                else
+                    Loader.drawPuzzleCover(i + Puzzle.PUZZLE_FIRSTID[templeId], x, y, IMAGE_PIXEL_SIZE, g, pixelMask, medal(i));
+                System.gc();
+            }
+            if (!lastPuzzleIsUnlocked()) {
+                g.drawImage(lockImage, width, height, Graphics.RIGHT | Graphics.BOTTOM);
+            }
+        }
+        // remaining temples
+        backgroundImage = ImageHelper.loadImage("/images/temple" + Story.CHARACTER_NAMES[templeId].toLowerCase() + ".png");
+        buttonImage = ImageHelper.loadImage("/images/buttongold.png");
+        scrollerImage = ImageHelper.loadImage("/images/scroller.png");
+        // change framerate
+        framePeriod = 40;
     }
     
     private void clearNotify() {
@@ -275,10 +324,10 @@ public class TempleScene extends GameScene implements StoryPlayer {
 //#elif ScreenWidth == 320
                 if (templeId == TempleScene.TEMPLE_CYLOP) {
                     if (x > 23 && x < 93 && y > 55 && y < 85)
-                        parent.gotoPlay(activePuzzle, templeId, marginTop);
+                        main.gotoPlay(activePuzzle, templeId, marginTop);
                 } else {
                     if (x > 7 && x < 77 && y > 55 && y < 85)
-                        parent.gotoPlay(activePuzzle, templeId, marginTop);
+                        main.gotoPlay(activePuzzle, templeId, marginTop);
                 }
 //#endif
             }
@@ -298,7 +347,7 @@ public class TempleScene extends GameScene implements StoryPlayer {
                     //parent.openTemple(TEMPLE_FLORA);
                     openStory(Story.STORY_CYLOP_FLORA);
                 } else {
-                    parent.gotoIslandMap();
+                    main.gotoIslandMap();
                 }
                 return;
             }
@@ -360,7 +409,7 @@ public class TempleScene extends GameScene implements StoryPlayer {
                     //parent.openTemple(TEMPLE_FLORA);
                     openStory(Story.STORY_CYLOP_FLORA);
                 } else {
-                    parent.gotoIslandMap();
+                    main.gotoIslandMap();
                 }
             } else if (x > 170 && x < 240 && y > 154 && y < 182) {
                 // no
@@ -371,8 +420,8 @@ public class TempleScene extends GameScene implements StoryPlayer {
             // select 1 puzzle
             if (x > puzzleViewRectangle[0] && x < puzzleViewRectangle[0] + puzzleViewRectangle[2]) {
                 if (y > puzzleViewRectangle[1] && y < puzzleViewRectangle[1] + puzzleViewRectangle[3]) {
-                    int col = (x - puzzleViewRectangle[0]) / PUZZLE_SIZE;
-                    int row = (y - marginTop) / PUZZLE_SIZE;
+                    int col = (x - puzzleViewRectangle[0]) / PUZZLE_IMAGE_SIZE;
+                    int row = (y - marginTop) / PUZZLE_IMAGE_SIZE;
                     activePuzzle = Puzzle.PUZZLE_FIRSTID[templeId] + row * 3 + col;
                     selectPuzzle();
                 }
@@ -393,12 +442,6 @@ public class TempleScene extends GameScene implements StoryPlayer {
         }
         backgroundImage = null;
     }
-    
-//#if ScreenWidth == 400
-//#     private static final int IMAGE_PIXEL_SIZE = 4;
-//#elif ScreenWidth == 320
-    private static final int IMAGE_PIXEL_SIZE = 3;
-//#endif
     
     private void selectPuzzle() {
         if (templeId == TEMPLE_CYLOP && activePuzzle > solvedPuzzle + 1) {
@@ -440,7 +483,7 @@ public class TempleScene extends GameScene implements StoryPlayer {
         }
     }
     
-    public String getPlayerName() { return parent.playerName; }
+    public String getPlayerName() { return main.playerName; }
     
     private void openStory(int storyId) {
         story = Story.getStory(storyId, this);
@@ -474,8 +517,8 @@ public class TempleScene extends GameScene implements StoryPlayer {
                 openStory(Story.STORY_CYLOP_FLORA);
                 notifyStatus = 0;
             } else {
-                parent.openTemple(TEMPLE_FLORA);
-                parent.gotoIslandMap();
+                main.openTemple(TEMPLE_FLORA);
+                main.gotoIslandMap();
             }
         }
     }

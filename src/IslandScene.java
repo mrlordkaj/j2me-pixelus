@@ -21,16 +21,17 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.Sprite;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
+import util.ImageHelper;
 import util.StringHelper;
 
 /**
  *
  * @author Thinh Pham
  */
-class IslandScene extends GameScene implements StoryPlayer {
+class IslandScene extends LazyScene implements StoryPlayer {
     
 //#if ScreenWidth == 400
-//#     public static final int[][] TEMPLE_RECTANGLE = new int[][] {
+//#     private static final int[][] TEMPLE_RECTANGLE = new int[][] {
 //#         { 189, 144, 54, 34 },   // Cylop
 //#         { 197, 177, 70, 46 },   // Flora
 //#         { 141, 78, 78, 66 },    // Cupid
@@ -57,7 +58,7 @@ class IslandScene extends GameScene implements StoryPlayer {
     };
 //#endif
     
-    public Image islandImage, lightingImage, templeArrowImage;
+    private Image islandImage, lightingImage, templeArrowImage;
     private int[] lightingPosition = new int[2];
     
     // temple management
@@ -66,24 +67,18 @@ class IslandScene extends GameScene implements StoryPlayer {
     private boolean[] templeCompleted;
     
     private int selectedTemple = -1, totalSolvedPuzzle = 0, templeArrowMargin = 6;
-    public int totalOpenedTemple, newTemple;
+    private int totalOpenedTemple, newTemple;
     private boolean templeArrowClosing = true;
-    public Sprite starSprite;
-    public Story story;
-    
-    private final Main parent;
-    
-    public boolean getTempleCompleted(int i) { return templeCompleted[i]; }
-    public boolean templeIsPerfect(int i) { return templePerfectPuzzle[i] == templeTotalPuzzle[i]; }
+    private Sprite starSprite;
+    private Story story;
     
     public IslandScene(Main parent) {
-        super();
-        this.parent = parent;
-        prepareResource();
+        super(parent);
         start(100);
     }
     
-    private void prepareResource() {
+    void prepareResource() {
+        // load record store
         try {
             RecordStore rs = RecordStore.openRecordStore(Main.RMS_USER, false);
             totalOpenedTemple = Integer.parseInt(new String(rs.getRecord(Main.RMS_USER_OPENEDTEMPLE)));
@@ -101,10 +96,36 @@ class IslandScene extends GameScene implements StoryPlayer {
                     totalSolvedPuzzle += templeSolvedPuzzle[i];
             }
             newTemple = Integer.parseInt(new String(rs.getRecord(Main.RMS_USER_NEWTEMPLE)));
+        } catch (RecordStoreException ex) { }
+        // prepare island image
+        islandImage = Image.createImage(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
+        Graphics g = islandImage.getGraphics();
+        g.drawImage(ImageHelper.loadImage("/images/islandmap.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
+        ImageHelper.MEDAL_SPRITE.setFrame(0);
+        for (int i = 0; i < totalOpenedTemple; i++) {
+            if (templeCompleted[i]) {
+                // draw lighted temple
+                g.drawImage(ImageHelper.loadImage("/images/map" + Story.CHARACTER_NAMES[i].toLowerCase() + "b.png"), IslandScene.TEMPLE_RECTANGLE[i][0], IslandScene.TEMPLE_RECTANGLE[i][1], Graphics.LEFT | Graphics.TOP);
+                // draw medal to perfect
+                if (templePerfectPuzzle[i] == templeTotalPuzzle[i]) {
+                    // if temple is perfect
+                    ImageHelper.MEDAL_SPRITE.setPosition(IslandScene.TEMPLE_RECTANGLE[i][0] + IslandScene.TEMPLE_RECTANGLE[i][2] / 2, IslandScene.TEMPLE_RECTANGLE[i][1] + IslandScene.TEMPLE_RECTANGLE[i][3] - 12);
+                    ImageHelper.MEDAL_SPRITE.paint(g);
+                }
+            }
+            else if (i != 0) {
+                // draw normal temple
+                g.drawImage(ImageHelper.loadImage("/images/map" + Story.CHARACTER_NAMES[i].toLowerCase() + "a.png"), IslandScene.TEMPLE_RECTANGLE[i][0], IslandScene.TEMPLE_RECTANGLE[i][1], Graphics.LEFT | Graphics.TOP);
+            }
+            System.gc();
         }
-        catch (RecordStoreException ex) { }
-        
-        new Loader(this).start();
+        // prepare other images
+        lightingImage = ImageHelper.loadImage("/images/lighting.png");
+        templeArrowImage = ImageHelper.loadImage("/images/templearrow.png");
+        starSprite = new Sprite(ImageHelper.loadImage("/images/star.png"), 100, 16);
+        starSprite.setPosition(25, 168);
+        if (newTemple == 0)
+            story = Story.getStory(Story.STORY_CYLOP_CYLOP, this);
     }
     
     protected void update() {
@@ -212,7 +233,7 @@ class IslandScene extends GameScene implements StoryPlayer {
             story.pointerPressed(x, y);
         } else {
             if (x > 0 && x < 80 && y > 0 && y < 60) {
-                parent.gotoMainMenu();
+                main.gotoMainMenu();
                 return;
             }
             
@@ -227,7 +248,7 @@ class IslandScene extends GameScene implements StoryPlayer {
                     } catch (RecordStoreException ex) {}
                 }
                 // switch to temple screen
-                parent.gotoTemple(selectedTemple, false);
+                main.gotoTemple(selectedTemple, false);
                 return;
             }
 
@@ -264,5 +285,5 @@ class IslandScene extends GameScene implements StoryPlayer {
         story = null;
     }
     
-    public String getPlayerName() { return parent.playerName; }
+    public String getPlayerName() { return main.playerName; }
 }

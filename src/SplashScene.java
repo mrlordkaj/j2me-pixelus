@@ -49,6 +49,10 @@ public class SplashScene extends GameScene {
         start(2000);
     }
     
+    void prepareResource() {
+        
+    }
+    
     public void setLoadingStatus(boolean status) {
         isLoading = status;
     }

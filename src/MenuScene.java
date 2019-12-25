@@ -60,7 +60,7 @@ public class MenuScene extends GameScene implements CommandListener {
         start(40);
     }
     
-    private void prepareResource() {
+    final void prepareResource() {
         backgroundImage = ImageHelper.loadImage("/images/mainmenubackground.png");
 //        if(parent.displayAds) {
 //            ads = IADView.getBannerAdData(parent, Main.NAX_CODE);

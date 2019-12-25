@@ -20,11 +20,9 @@ import java.util.Calendar;
 //import java.util.Timer;
 //import java.util.TimerTask;
 import javax.microedition.lcdui.Display;
-import javax.microedition.lcdui.game.Sprite;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
-import util.ImageHelper;
 import util.MathHelper;
 
 /**
@@ -100,9 +98,13 @@ public class Main extends MIDlet {
 //        }, 0, 500);
     }
     
-    protected void pauseApp() { }
+    protected void pauseApp() {
     
-    protected void destroyApp(boolean unconditional) { }
+    }
+    
+    protected void destroyApp(boolean unconditional) {
+    
+    }
     
     public void bannerPressed() {
         displayAds = false;
@@ -145,7 +147,7 @@ public class Main extends MIDlet {
     public void gotoPlay(int puzzleId, int templeId, int templeMarginTop) {
         this.templeMarginTop = templeMarginTop;
         child.dispose();
-        child = new PlayScene(puzzleId, templeId, this);
+        child = new PlayScene(this, templeId, puzzleId);
         Display.getDisplay(this).setCurrent(child);
     }
     

@@ -18,6 +18,7 @@
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.Sprite;
+import util.Button;
 import util.ImageHelper;
 
 /**
@@ -40,6 +41,15 @@ public class Hint {
     private final PlayScene parent;
     private String data;
     private StringBuffer processData;
+    
+    private final Button btnClose = new Button(0, 0, 80, 50);
+//#if ScreenWidth == 400
+//#     private final Button btnOne = new Button(330, 128, 50, 50);
+//#     private final Button btnAll = new Button(330, 184, 50, 50);
+//#elif ScreenWidth == 320
+    private final Button btnOne = new Button(4, 48, 40, 40);
+    private final Button btnAll = new Button(54, 48, 40, 40);
+//#endif
     
     public Hint(String data, PlayScene parent) {
         this.parent = parent;
@@ -93,38 +103,23 @@ public class Hint {
     }
     
     public void pointerPressed(int x, int y) {
-        if (x > 0 && x < 80 && y > 0 && y < 50) {
+        if (btnClose.contains(x, y)) {
             parent.closeHint();
         }
-        
-        if (isSliding || isAuto) return;
-        
-        // TODO: predef button positions
-//#if ScreenWidth == 400
-//#         if (x > 330 && x < 380 && y > 128 && y < 178) {
-//#             // one move button
-//#             if (processData.length() > 0)
-//#                 doTurn();
-//#             else
-//#                 reset();
-//#         } else if (x > 330 && x < 380 && y > 184 && y < 234) {
-//#             // all moves button
-//#             isAuto = true;
-//#             reset();
-//#         }
-//#elif ScreenWidth == 320
-        if (x > 4 && x < 44 && y > 48 && y < 88) {
+        if (isSliding || isAuto) {
+            return;
+        }
+        if (btnOne.contains(x, y)) {
             // one move button
             if (processData.length() > 0)
                 doTurn();
             else
                 reset();
-        } else if (x > 54 && x < 94 && y > 48 && y < 88) {
+        } else if (btnAll.contains(x, y)) {
             // all moves button
             isAuto = true;
             reset();
         }
-//#endif
     }
     
     private void doTurn() {

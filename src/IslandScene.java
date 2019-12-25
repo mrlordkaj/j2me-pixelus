@@ -74,6 +74,7 @@ class IslandScene extends LazyScene implements StoryPlayer {
     
     public IslandScene(Main parent) {
         super(parent);
+        startLazyLoad();
         start(100);
     }
     

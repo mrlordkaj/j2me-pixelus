@@ -23,21 +23,21 @@ import util.ImageHelper;
  *
  * @author Thinh Pham
  */
-public class Loader extends Thread {
+class LazyLoad extends Thread {
     
     private final LazyScene scene;
     
-    public Loader(LazyScene scene) {
+    LazyLoad(LazyScene scene) {
         this.scene = scene;
     }
     
     public void run() {
-        scene.prepareResource();
         try {
+            scene.prepareResource();
             Thread.sleep(1000);
             System.gc();
+            scene.isLoading = false;
         } catch (InterruptedException ex) { }
-        scene.isLoading = false;
     }
     
 //#if ScreenWidth == 400

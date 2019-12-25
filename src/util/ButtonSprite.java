@@ -24,40 +24,29 @@ import javax.microedition.lcdui.game.Sprite;
  *
  * @author Thinh Pham
  */
-public class GraphicButton {
+public class ButtonSprite extends Button {
     
     private final Sprite sprite;
-    private final int x, y, width, height;
     private final byte cmd;
-    public int active = 0;
+    public boolean active;
     
-    public GraphicButton(String imagePath, byte _cmd, int _x, int _y, int _width, int _height) {
-        x = _x;
-        y = _y;
-        width = _width;
-        height = _height;
-        cmd = _cmd;
-        sprite = new Sprite(ImageHelper.loadImage(imagePath), width, height);
+    public ButtonSprite(String imagePath, byte cmd, int x, int y, int width, int height) {
+        this(ImageHelper.loadImage(imagePath), cmd, x, y, width, height);
     }
     
-    public GraphicButton(Image img, byte _cmd, int _x, int _y, int _width, int _height) {
-        x = _x;
-        y = _y;
-        width = _width;
-        height = _height;
-        cmd = _cmd;
+    public ButtonSprite(Image img, byte cmd, int x, int y, int width, int height) {
+        super(x, y, width, height);
+        this.cmd = cmd;
         sprite = new Sprite(img, width, height);
+        sprite.setPosition(x, y);
     }
     
-    public byte getCommand() { return cmd; }
+    public byte getCommand() {
+        return cmd;
+    }
     
     public void paint(Graphics g) {
-        sprite.setFrame(active);
-        sprite.setPosition(x, y);
+        sprite.setFrame(active ? 1 : 0);
         sprite.paint(g);
-    }
-    
-    public boolean contains(int x, int y) {
-        return (x > this.x && x < this.x + width && y > this.y && y < this.y + height);
     }
 }

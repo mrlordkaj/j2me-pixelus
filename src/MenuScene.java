@@ -27,7 +27,7 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.TextBox;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
-import util.GraphicButton;
+import util.ButtonSprite;
 import util.ImageHelper;
 
 /**
@@ -44,7 +44,7 @@ public class MenuScene extends GameScene implements CommandListener {
     
     private boolean touching = false;
     private Image backgroundImage, confirmDialogImage, messageDialogImage;
-    private GraphicButton[] menuItem;
+    private ButtonSprite[] menuItems;
     private byte activeCommand = COMMAND_NONE;
     private String tempName = "Claudius";
     private TextBox txtPlayerName;
@@ -66,18 +66,18 @@ public class MenuScene extends GameScene implements CommandListener {
 //            ads = IADView.getBannerAdData(parent, Main.NAX_CODE);
 //        }
 //#if ScreenWidth == 400
-//#         menuItem = new GraphicButton[] {
-//#             new GraphicButton("/images/menuitemplay.png", COMMAND_PLAY, 264, 34, 54, 58),
-//#             new GraphicButton("/images/menuitemextras.png", COMMAND_EXTRAS, 296, 126, 54, 34),
-//#             new GraphicButton("/images/menuitemabout.png", COMMAND_ABOUT, 280, 177, 69, 20),
-//#             new GraphicButton("/images/menuitemquit.png", COMMAND_QUIT, 280, 206, 53, 21)
+//#         menuItems = new ButtonSprite[] {
+//#             new ButtonSprite("/images/menuitemplay.png", COMMAND_PLAY, 264, 34, 54, 58),
+//#             new ButtonSprite("/images/menuitemextras.png", COMMAND_EXTRAS, 296, 126, 54, 34),
+//#             new ButtonSprite("/images/menuitemabout.png", COMMAND_ABOUT, 280, 177, 69, 20),
+//#             new ButtonSprite("/images/menuitemquit.png", COMMAND_QUIT, 280, 206, 53, 21)
 //#         };
 //#elif ScreenWidth == 320
-        menuItem = new GraphicButton[] {
-            new GraphicButton("/images/menuitemplay.png", COMMAND_PLAY, 188, 34, 54, 58),
-            new GraphicButton("/images/menuitemextras.png", COMMAND_EXTRAS, 218, 122, 54, 34),
-            new GraphicButton("/images/menuitemabout.png", COMMAND_ABOUT, 202, 170, 69, 20),
-            new GraphicButton("/images/menuitemquit.png", COMMAND_QUIT, 202, 200, 53, 21)
+        menuItems = new ButtonSprite[] {
+            new ButtonSprite("/images/menuitemplay.png", COMMAND_PLAY, 188, 34, 54, 58),
+            new ButtonSprite("/images/menuitemextras.png", COMMAND_EXTRAS, 218, 122, 54, 34),
+            new ButtonSprite("/images/menuitemabout.png", COMMAND_ABOUT, 202, 170, 69, 20),
+            new ButtonSprite("/images/menuitemquit.png", COMMAND_QUIT, 202, 200, 53, 21)
         };
 //#endif
         // welcome string
@@ -98,7 +98,7 @@ public class MenuScene extends GameScene implements CommandListener {
         // draw background
         g.drawImage(backgroundImage, 0, 0, Graphics.LEFT | Graphics.TOP);
         for(int i = 0; i < 4; i++) {
-            menuItem[i].paint(g);
+            menuItems[i].paint(g);
         }
         // draw welcome string
 //#if ScreenWidth == 400
@@ -204,13 +204,13 @@ public class MenuScene extends GameScene implements CommandListener {
         else {
             touching = false;
             for (int i = 0; i < 4; i++) {
-                menuItem[i].active = 0;
+                menuItems[i].active = false;
             }
             // excute command
             switch (activeCommand) {
                 case COMMAND_PLAY:
                     if (parent.playerName.equals("")) {
-                        confirmDialogImage = Loader.confirmDialog(new String[] {
+                        confirmDialogImage = LazyLoad.confirmDialog(new String[] {
                             "Enter your name:"
                         });
                     }
@@ -220,7 +220,7 @@ public class MenuScene extends GameScene implements CommandListener {
                     break;
 
                 case COMMAND_EXTRAS:
-                    messageDialogImage = Loader.messageDialog(new String[] {
+                    messageDialogImage = LazyLoad.messageDialog(new String[] {
                         "This feature is not",
                         "available by now!"
                     });
@@ -231,7 +231,7 @@ public class MenuScene extends GameScene implements CommandListener {
                     break;
 
                 case COMMAND_QUIT:
-                    confirmDialogImage = Loader.confirmDialog(new String[] {
+                    confirmDialogImage = LazyLoad.confirmDialog(new String[] {
                         "Are you sure you",
                         "want to quit the",
                         "Pixelus Mobile?"
@@ -270,7 +270,7 @@ public class MenuScene extends GameScene implements CommandListener {
         isPlaying = false;
         backgroundImage = null;
         confirmDialogImage = null;
-        menuItem = null;
+        menuItems = null;
         tempName = null;
         txtPlayerName = null;
 //        ads = null;
@@ -278,12 +278,12 @@ public class MenuScene extends GameScene implements CommandListener {
     
     private void setActiveMenu(int x, int y) {
         for (int i = 0; i < 4; i++) {
-            menuItem[i].active = 0;
+            menuItems[i].active = false;
         }
         for (int i = 0; i < 4; i++) {
-            if (menuItem[i].contains(x, y)) {
-                menuItem[i].active = 1;
-                activeCommand = menuItem[i].getCommand();
+            if (menuItems[i].contains(x, y)) {
+                menuItems[i].active = true;
+                activeCommand = menuItems[i].getCommand();
                 return;
             }
         }

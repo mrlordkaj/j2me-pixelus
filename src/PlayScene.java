@@ -22,7 +22,7 @@ import javax.microedition.lcdui.game.Sprite;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 import util.DataHelper;
-import util.GraphicButton;
+import util.ButtonSprite;
 import util.ImageHelper;
 import util.StringHelper;
 
@@ -101,12 +101,13 @@ public class PlayScene extends LazyScene {
     private Hint hint;
     private Tutorial tutorial;
     private String hintData;
-    private GraphicButton[] buttons;
+    private ButtonSprite[] buttons;
     
     public PlayScene(Main parent, int templeId, int puzzleId) {
         super(parent);
         this.puzzleId = puzzleId;
         this.templeId = templeId;
+        startLazyLoad();
         start(100);
     }
     
@@ -197,7 +198,7 @@ public class PlayScene extends LazyScene {
 //#         puzzleCompleteImage = Image.createImage(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
 //#         g = puzzleCompleteImage.getGraphics();
 //#         g.drawImage(ImageHelper.loadImage("/images/puzzlecompleted.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
-//#         Loader.drawPuzzleImage(puzzleId, 161, 50, 5, g, ImageHelper.createPixelMask(5), 3);
+//#         LazyLoad.drawPuzzleImage(puzzleId, 161, 50, 5, g, ImageHelper.createPixelMask(5), 3);
 //#         g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
 //#         g.setColor(0x000000);
 //#         g.drawString(title, Main.SCREEN_WIDTH / 2 + 1, 148 + 1, Graphics.HCENTER | Graphics.BASELINE);
@@ -205,12 +206,12 @@ public class PlayScene extends LazyScene {
 //#         g.drawString(title, Main.SCREEN_WIDTH / 2, 148, Graphics.HCENTER | Graphics.BASELINE);
 //#         
 //#         Image gamepadImage = ImageHelper.loadImage("/images/navbutton.png");
-//#         buttons = new GraphicButton[] {
-//#             new GraphicButton(gamepadImage, PlayScene.COMMAND_UP, 308, 131, 40, 30),
-//#             new GraphicButton(gamepadImage, PlayScene.COMMAND_RIGHT, 350, 164, 40, 30),
-//#             new GraphicButton(gamepadImage, PlayScene.COMMAND_DOWN, 308, 197, 40, 30),
-//#             new GraphicButton(gamepadImage, PlayScene.COMMAND_LEFT, 266, 164, 40, 30),
-//#             new GraphicButton(gamepadImage, PlayScene.COMMAND_FIRE, 308, 164, 40, 30)
+//#         buttons = new ButtonSprite[] {
+//#             new ButtonSprite(gamepadImage, PlayScene.COMMAND_UP, 308, 131, 40, 30),
+//#             new ButtonSprite(gamepadImage, PlayScene.COMMAND_RIGHT, 350, 164, 40, 30),
+//#             new ButtonSprite(gamepadImage, PlayScene.COMMAND_DOWN, 308, 197, 40, 30),
+//#             new ButtonSprite(gamepadImage, PlayScene.COMMAND_LEFT, 266, 164, 40, 30),
+//#             new ButtonSprite(gamepadImage, PlayScene.COMMAND_FIRE, 308, 164, 40, 30)
 //#         };
 //#         
 //#         sidebarImage = Image.createImage(148, 240);
@@ -232,7 +233,7 @@ public class PlayScene extends LazyScene {
         puzzleCompleteImage = Image.createImage(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
         g = puzzleCompleteImage.getGraphics();
         g.drawImage(ImageHelper.loadImage("/images/puzzlecompleted.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
-        Loader.drawPuzzleImage(puzzleId, 128, 48, 4, g, ImageHelper.createPixelMask(4), 3);
+        LazyLoad.drawPuzzleImage(puzzleId, 128, 48, 4, g, ImageHelper.createPixelMask(4), 3);
         g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
         g.setColor(0x000000);
         g.drawString(title, Main.SCREEN_WIDTH / 2 + 1, 130 + 1, Graphics.HCENTER | Graphics.BASELINE);
@@ -655,11 +656,11 @@ public class PlayScene extends LazyScene {
                 RecordStore rs = RecordStore.openRecordStore(Main.RMS_USER, false);
                 String notifyStatus = "0";
                 byte[] data;
-                //số puzzle đã giải
-                int solvedPuzzle = Integer.parseInt(new String(rs.getRecord(Main.RMS_USER_SOLVEDPUZZLE)));
+                // number of solved puzzles
+                int numSolvedPuzzles = Integer.parseInt(new String(rs.getRecord(Main.RMS_USER_SOLVEDPUZZLE)));
                 if (bestMove == 0) { // if unsolved puzzle before
-                    solvedPuzzle++;
-                    data = Integer.toString(solvedPuzzle).getBytes();
+                    numSolvedPuzzles++;
+                    data = Integer.toString(numSolvedPuzzles).getBytes();
                     rs.setRecord(Main.RMS_USER_SOLVEDPUZZLE, data, 0, data.length);
                     templeSolvedPuzzle++;
                     // record message
@@ -672,7 +673,7 @@ public class PlayScene extends LazyScene {
                     // open new temple
                     else {
                         for (byte i = 0; i < TempleScene.TEMPLE_REQUIRE.length; i++) {
-                            if (solvedPuzzle == TempleScene.TEMPLE_REQUIRE[i]) {
+                            if (numSolvedPuzzles == TempleScene.TEMPLE_REQUIRE[i]) {
                                 notifyStatus = "4";
                                 if (i != TempleScene.TEMPLE_CYLOP)
                                     main.openTemple(i);
@@ -991,7 +992,7 @@ public class PlayScene extends LazyScene {
 //#                 return;
 //#             } else if (x > 266 && x < 326 && y > 44 && y < 74) {
 //#                 // Back button
-//#                 confirmDialogImage = Loader.confirmDialog(new String[] {
+//#                 confirmDialogImage = LazyLoad.confirmDialog(new String[] {
 //#                     "Do you want to come",
 //#                     "back to the temple?",
 //#                     "Your puzzle process",
@@ -1002,7 +1003,7 @@ public class PlayScene extends LazyScene {
 //#                 return;
 //#             } else if(x > 328 && x < 388 && y > 44 && y < 74) {
 //#                 // Reset button
-//#                 confirmDialogImage = Loader.confirmDialog(new String[] {
+//#                 confirmDialogImage = LazyLoad.confirmDialog(new String[] {
 //#                     "Are you sure you",
 //#                     "want to reset",
 //#                     "this puzzle process?"
@@ -1033,7 +1034,7 @@ public class PlayScene extends LazyScene {
             }
             else if (x > 258 && x < 312 && y > 154 && y < 180) {
                 // Reset button
-                confirmDialogImage = Loader.confirmDialog(new String[] {
+                confirmDialogImage = LazyLoad.confirmDialog(new String[] {
                     "Are you sure you",
                     "want to reset",
                     "this puzzle process?"
@@ -1044,7 +1045,7 @@ public class PlayScene extends LazyScene {
         }
         if (x > 256 && x < 314 && y > 218 && y < 236) {
             // Back button
-            confirmDialogImage = Loader.confirmDialog(new String[] {
+            confirmDialogImage = LazyLoad.confirmDialog(new String[] {
                 "Do you want to come",
                 "back to the temple?",
                 "Your puzzle process",
@@ -1114,7 +1115,7 @@ public class PlayScene extends LazyScene {
     protected void pointerReleased(int x, int y) {
 //#if ScreenWidth == 400
 //#         if (curtainTimeline >= 116 && x > 316 && y < 38)
-//#             parent.gotoTemple(templeId, true);
+//#             main.gotoTemple(templeId, true);
 //#elif ScreenWidth == 320
         if (curtainTimeline >= 116 && x > 116 && x < 204 && y > 220)
             main.gotoTemple(templeId, true);
@@ -1160,7 +1161,7 @@ public class PlayScene extends LazyScene {
 //#if ScreenWidth == 400
 //#             else if (navbarTouching) {
 //#                 for (int i = 0; i < 5; i++) {
-//#                     buttons[i].active = 0;
+//#                     buttons[i].active = false;
 //#                 }
 //#                 if (activeCommand == COMMAND_FIRE) {
 //#                     if (isPossible)
@@ -1374,11 +1375,11 @@ public class PlayScene extends LazyScene {
     
     private void setActiveButton(int x, int y) {
         for (int i = 0; i < 5; i++) {
-            buttons[i].active = 0;
+            buttons[i].active = false;
         }
         for (int i = 0; i < 5; i++) {
             if (buttons[i].contains(x, y)) {
-                buttons[i].active = 1;
+                buttons[i].active = true;
                 activeCommand = buttons[i].getCommand();
                 return;
             }

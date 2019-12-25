@@ -14,21 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package util;
 
 /**
  *
  * @author Thinh Pham
  */
-abstract class LazyScene extends GameScene {
+public class Button {
     
-    Main main;
+    private final int x, y, width, height;
     
-    LazyScene(Main parent) {
-        super();
-        this.main = parent;
+    public Button(int x, int y, int width, int height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
     }
     
-    final void startLazyLoad() {
-        new LazyLoad(this).start();
+    public boolean contains(int x, int y) {
+        return (x > this.x && x < this.x + width && y > this.y && y < this.y + height);
     }
 }

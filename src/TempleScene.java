@@ -20,6 +20,7 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
+import util.Button;
 import util.ImageHelper;
 import util.StringHelper;
 
@@ -42,9 +43,9 @@ public class TempleScene extends LazyScene implements StoryPlayer {
     static final int TEMPLE_JUPITER = 9;
     static final short[] TEMPLE_REQUIRE = new short[] { 194, 0, 9, 20, 34, 50, 72, 100, 128, 160 };
     
-    public Image puzzleViewImage, scrollerImage, backgroundImage, buttonImage, selectedPuzzleImage;
-    public Image messageDialogImage, confirmDialogImage;
-    public StoryPage story;
+    private Image puzzleViewImage, scrollerImage, backgroundImage, buttonImage, selectedPuzzleImage;
+    private Image messageDialogImage, confirmDialogImage;
+    private StoryPage story;
     
     // tutorial only
     private boolean firstTimeToPlay;
@@ -66,13 +67,21 @@ public class TempleScene extends LazyScene implements StoryPlayer {
     
     private int[] bestAmountTurn, bestAmountTime, medal;
     
-    public int getSolvedPuzzle() { return solvedPuzzle; }
-    public boolean lastPuzzleIsUnlocked() { return lastPuzzleUnlocked; }
-    public int getTempleId() { return templeId; }
-    public int getPuzzleViewHeight() { return puzzleViewHeight; }
-    public int bestAmountTurn(int puzzle) { return bestAmountTurn[puzzle]; }
-    public int bestAmountTime(int puzzle) { return bestAmountTime[puzzle]; }
-    public int medal(int relativePuzzleId) { return medal[relativePuzzleId]; }
+//#if ScreenWidth == 400
+//#     private static final int PUZZLE_IMAGE_SIZE = 68;
+//#     private static final int IMAGE_PIXEL_SIZE = 4;
+//#     
+//#     private final Button btnPlayTutorial = new Button(35, 55, 70, 30);
+//#     private final Button btnPlayNormal = new Button(19, 55, 70, 30);
+//#elif ScreenWidth == 320
+    private static final int PUZZLE_IMAGE_SIZE = 53;
+    private static final int IMAGE_PIXEL_SIZE = 3;
+    
+    private final Button btnPlayTutorial = new Button(23, 55, 70, 30);
+    private final Button btnPlayNormal = new Button(7, 55, 70, 30);
+//#endif
+    
+    private final Button btnBack = new Button(0, 0, 80, 50);
     
     public TempleScene(Main parent, int templeId) {
         this(parent, templeId, 0);
@@ -82,16 +91,9 @@ public class TempleScene extends LazyScene implements StoryPlayer {
         super(parent);
         this.templeId = templeId;
         this.marginTop = marginTop;
+        startLazyLoad();
         start(100);
     }
-    
-//#if ScreenWidth == 400
-//#     private static final int PUZZLE_IMAGE_SIZE = 68;
-//#     private static final int IMAGE_PIXEL_SIZE = 4;
-//#elif ScreenWidth == 320
-    private static final int PUZZLE_IMAGE_SIZE = 53;
-    private static final int IMAGE_PIXEL_SIZE = 3;
-//#endif
     
     void prepareResource() {
         puzzleViewHeight = ((Puzzle.PUZZLE_FIRSTID[templeId + 1] - Puzzle.PUZZLE_FIRSTID[templeId]) / 3) * PUZZLE_IMAGE_SIZE - 4;
@@ -162,7 +164,7 @@ public class TempleScene extends LazyScene implements StoryPlayer {
                 break;
                 
             case 1:
-                messageDialogImage = Loader.messageDialog(new String[] {
+                messageDialogImage = LazyLoad.messageDialog(new String[] {
                     "The secret puzzle",
                     "in this temple",
                     "has been unlocked!"
@@ -177,7 +179,7 @@ public class TempleScene extends LazyScene implements StoryPlayer {
         // draw puzzle list
         int numPuzzle = Puzzle.PUZZLE_FIRSTID[templeId + 1] - Puzzle.PUZZLE_FIRSTID[templeId];
         int width = PUZZLE_IMAGE_SIZE * 3 - 4;
-        int height = getPuzzleViewHeight();
+        int height = puzzleViewHeight;
         puzzleViewImage = Image.createImage(width, height);
         Graphics g = puzzleViewImage.getGraphics();
         if (templeId == TempleScene.TEMPLE_CYLOP) {
@@ -187,13 +189,12 @@ public class TempleScene extends LazyScene implements StoryPlayer {
             for (int i = 1; i <= numPuzzle; i++) {
                 int y = ((i - 1) / 3) * PUZZLE_IMAGE_SIZE;
                 int x = ((i - 1) % 3) * PUZZLE_IMAGE_SIZE;
-                if (i <= getSolvedPuzzle()) {
-                    Loader.drawPuzzleImage(i, x, y, IMAGE_PIXEL_SIZE, g, pixelMask, Puzzle.MEDAL_NONE);
+                if (i <= solvedPuzzle) {
+                    LazyLoad.drawPuzzleImage(i, x, y, IMAGE_PIXEL_SIZE, g, pixelMask, Puzzle.MEDAL_NONE);
+                } else {
+                    LazyLoad.drawPuzzleCover(i, x, y, IMAGE_PIXEL_SIZE, g, pixelMask, Puzzle.MEDAL_NONE);
                 }
-                else {
-                    Loader.drawPuzzleCover(i, x, y, IMAGE_PIXEL_SIZE, g, pixelMask, Puzzle.MEDAL_NONE);
-                }
-                if (i > getSolvedPuzzle() + 1) {
+                if (i > solvedPuzzle + 1) {
                     g.drawImage(lockImage, x, y, Graphics.LEFT | Graphics.TOP);
                 }
                 System.gc();
@@ -206,13 +207,13 @@ public class TempleScene extends LazyScene implements StoryPlayer {
             for (int i = 0; i < numPuzzle; i++) {
                 int y = (i / 3) * PUZZLE_IMAGE_SIZE;
                 int x = (i % 3) * PUZZLE_IMAGE_SIZE;
-                if (bestAmountTurn(i) > 0)
-                    Loader.drawPuzzleImage(i + Puzzle.PUZZLE_FIRSTID[templeId], x, y, IMAGE_PIXEL_SIZE, g, pixelMask, medal(i));
+                if (bestAmountTurn[i] > 0)
+                    LazyLoad.drawPuzzleImage(i + Puzzle.PUZZLE_FIRSTID[templeId], x, y, IMAGE_PIXEL_SIZE, g, pixelMask, medal[i]);
                 else
-                    Loader.drawPuzzleCover(i + Puzzle.PUZZLE_FIRSTID[templeId], x, y, IMAGE_PIXEL_SIZE, g, pixelMask, medal(i));
+                    LazyLoad.drawPuzzleCover(i + Puzzle.PUZZLE_FIRSTID[templeId], x, y, IMAGE_PIXEL_SIZE, g, pixelMask, medal[i]);
                 System.gc();
             }
-            if (!lastPuzzleIsUnlocked()) {
+            if (!lastPuzzleUnlocked) {
                 g.drawImage(lockImage, width, height, Graphics.RIGHT | Graphics.BOTTOM);
             }
         }
@@ -313,32 +314,18 @@ public class TempleScene extends LazyScene implements StoryPlayer {
         } else if (messageDialogImage == null && confirmDialogImage == null) {
             // play button
             if (activePuzzle > 0) {
-//#if ScreenWidth == 400
-//#                 if (templeId == TEMPLE_CYLOP) {
-//#                     if (x > 35 && x < 105 && y > 55 && y < 85)
-//#                         parent.gotoPlay(activePuzzle, templeId, marginTop);
-//#                 } else {
-//#                     if (x > 19 && x < 89 && y > 55 && y < 85)
-//#                         parent.gotoPlay(activePuzzle, templeId, marginTop);
-//#                 }
-//#elif ScreenWidth == 320
                 if (templeId == TempleScene.TEMPLE_CYLOP) {
-                    if (x > 23 && x < 93 && y > 55 && y < 85)
+                    if (btnPlayTutorial.contains(x, y))
                         main.gotoPlay(activePuzzle, templeId, marginTop);
                 } else {
-                    if (x > 7 && x < 77 && y > 55 && y < 85)
+                    if (btnPlayNormal.contains(x, y))
                         main.gotoPlay(activePuzzle, templeId, marginTop);
                 }
-//#endif
             }
             // back button
-//#if ScreenWidth == 400
-//#             if (x > 0 && x < 80 && y > 0 && y < 50) {
-//#elif ScreenWidth == 320
-            if (x > 0 && x < 80 && y > 0 && y < 50) {
-//#endif
+            if (btnBack.contains(x, y)) {
                 if (templeId == TempleScene.TEMPLE_CYLOP && solvedPuzzle < 9) {
-                    confirmDialogImage = Loader.confirmDialog(new String[] {
+                    confirmDialogImage = LazyLoad.confirmDialog(new String[] {
                         "Are you sure you",
                         "want to skip the",
                         "tutorial?"
@@ -396,7 +383,7 @@ public class TempleScene extends LazyScene implements StoryPlayer {
 //#                     //parent.openTemple(TEMPLE_FLORA);
 //#                     openStory(Story.STORY_CYLOP_FLORA);
 //#                 } else {
-//#                     parent.gotoIslandMap();
+//#                     main.gotoIslandMap();
 //#                 }
 //#             } else if (x > 210 && x < 276 && y > 154 && y < 182) {
 //#                 // no
@@ -445,14 +432,14 @@ public class TempleScene extends LazyScene implements StoryPlayer {
     
     private void selectPuzzle() {
         if (templeId == TEMPLE_CYLOP && activePuzzle > solvedPuzzle + 1) {
-            messageDialogImage = Loader.messageDialog(new String[] {
+            messageDialogImage = LazyLoad.messageDialog(new String[] {
                 "Not yet!",
                 "One step at a time,",
                 "now!"
             });
             activePuzzle = 0;
         } else if (!lastPuzzleUnlocked && activePuzzle == Puzzle.PUZZLE_FIRSTID[templeId + 1] - 1) {
-            messageDialogImage = Loader.messageDialog(new String[] {
+            messageDialogImage = LazyLoad.messageDialog(new String[] {
                 "Unlock secret puzzle",
                 "by solving all other",
                 "puzzles in this",
@@ -465,7 +452,7 @@ public class TempleScene extends LazyScene implements StoryPlayer {
 //#             selectedPuzzleImage = Image.createImage(64, 64);
 //#             Graphics g = selectedPuzzleImage.getGraphics();
 //#             int _medal = (templeId == TEMPLE_CYLOP) ? Puzzle.MEDAL_NONE : this.medal[activePuzzle - Puzzle.PUZZLE_FIRSTID[templeId]];
-//#             Loader.drawPuzzleCover(activePuzzle, 0, 0, IMAGE_PIXEL_SIZE, g, ImageHelper.createPixelMask(4), _medal);
+//#             LazyLoad.drawPuzzleCover(activePuzzle, 0, 0, IMAGE_PIXEL_SIZE, g, ImageHelper.createPixelMask(4), _medal);
 //#             g.setColor(0xffffffff);
 //#             g.drawRect(0, 0, 63, 63);
 //#             g.drawRect(1, 1, 61, 61);
@@ -473,7 +460,7 @@ public class TempleScene extends LazyScene implements StoryPlayer {
             selectedPuzzleImage = Image.createImage(48, 48);
             Graphics g = selectedPuzzleImage.getGraphics();
             int _medal = (templeId == TEMPLE_CYLOP) ? Puzzle.MEDAL_NONE : this.medal[activePuzzle - Puzzle.PUZZLE_FIRSTID[templeId]];
-            Loader.drawPuzzleCover(activePuzzle, 0, 0, IMAGE_PIXEL_SIZE, g, ImageHelper.createPixelMask(3), _medal);
+            LazyLoad.drawPuzzleCover(activePuzzle, 0, 0, IMAGE_PIXEL_SIZE, g, ImageHelper.createPixelMask(3), _medal);
             g.setColor(0xffffffff);
             g.drawRect(0, 0, 47, 47);
             g.drawRect(1, 1, 45, 45);

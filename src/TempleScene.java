@@ -84,15 +84,12 @@ public class TempleScene extends GameScene implements StoryPlayer {
     
     private final Button btnBack = new Button(0, 0, 80, 50);
     
-    private final Main main;
-    
-    public TempleScene(Main main, int templeId) {
-        this(main, templeId, 0);
+    public TempleScene(int templeId) {
+        this(templeId, 0);
     }
     
-    public TempleScene(Main main, int templeId, int marginTop) {
+    public TempleScene(int templeId, int marginTop) {
         super();
-        this.main = main;
         this.templeId = templeId;
         this.marginTop = marginTop;
         lazyLoad();
@@ -327,10 +324,10 @@ public class TempleScene extends GameScene implements StoryPlayer {
             if (activePuzzle > 0) {
                 if (templeId == TempleScene.TEMPLE_CYLOP) {
                     if (btnPlayTutorial.contains(x, y))
-                        main.gotoPlay(activePuzzle, templeId, marginTop);
+                        Main.getInstance().gotoPlay(activePuzzle, templeId, marginTop);
                 } else {
                     if (btnPlayNormal.contains(x, y))
-                        main.gotoPlay(activePuzzle, templeId, marginTop);
+                        Main.getInstance().gotoPlay(activePuzzle, templeId, marginTop);
                 }
             }
             // back button
@@ -345,7 +342,7 @@ public class TempleScene extends GameScene implements StoryPlayer {
                     //parent.openTemple(TEMPLE_FLORA);
                     openStory(Story.STORY_CYLOP_FLORA);
                 } else {
-                    main.gotoIslandMap();
+                    Main.getInstance().gotoIslandMap();
                 }
                 return;
             }
@@ -407,7 +404,7 @@ public class TempleScene extends GameScene implements StoryPlayer {
                     //parent.openTemple(TEMPLE_FLORA);
                     openStory(Story.STORY_CYLOP_FLORA);
                 } else {
-                    main.gotoIslandMap();
+                    Main.getInstance().gotoIslandMap();
                 }
             } else if (x > 170 && x < 240 && y > 154 && y < 182) {
                 // no
@@ -471,7 +468,7 @@ public class TempleScene extends GameScene implements StoryPlayer {
         }
     }
     
-    public String getPlayerName() { return main.playerName; }
+    public String getPlayerName() { return Main.getInstance().playerName; }
     
     private void openStory(int storyId) {
         story = Story.getStory(storyId, this);
@@ -505,8 +502,8 @@ public class TempleScene extends GameScene implements StoryPlayer {
                 openStory(Story.STORY_CYLOP_FLORA);
                 notifyStatus = 0;
             } else {
-                main.openTemple(TEMPLE_FLORA);
-                main.gotoIslandMap();
+                Main.getInstance().openTemple(TEMPLE_FLORA);
+                Main.getInstance().gotoIslandMap();
             }
         }
     }

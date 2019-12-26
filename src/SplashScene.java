@@ -42,11 +42,8 @@ public class SplashScene extends GameScene {
     private Image backgroundTexture;
     private Vector ads;
     
-    private final Main parent;
-    
-    public SplashScene(Main parent) {
+    public SplashScene() {
         super();
-        this.parent = parent;
         play(2000);
     }
     
@@ -127,15 +124,15 @@ public class SplashScene extends GameScene {
             if (x > imgX1 && x < imgX2 && y > imgY1 && y < imgY2) {
                 // click on ads
                 try {
-                    parent.bannerPressed();
-                    parent.platformRequest((String)ads.elementAt(1));
+                    Main.getInstance().bannerPressed();
+                    Main.getInstance().platformRequest((String)ads.elementAt(1));
                 }
                 catch (ConnectionNotFoundException ex) { }
             }
             nextScreen();
         }
         else if (currentScreen == SCREEN_SPLASH) {
-            parent.gotoMainMenu();
+            Main.getInstance().gotoMainMenu();
         }
     }
     
@@ -148,9 +145,9 @@ public class SplashScene extends GameScene {
                 break;
                 
             case SCREEN_SPONSOR:
-                if (parent.displayAds) {
+                if (Main.getInstance().displayAds) {
                     backgroundTexture = null;
-                    ads = IADView.getBannerAdData(parent, Main.NAX_CODE);
+                    ads = IADView.getBannerAdData(Main.getInstance(), Main.NAX_CODE);
                     if (ads == null) {
                         waiting = 2;
                         play(1000);

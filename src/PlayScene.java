@@ -104,11 +104,8 @@ public class PlayScene extends GameScene {
     private String hintData;
     private ButtonSprite[] buttons;
     
-    private final Main main;
-    
-    public PlayScene(Main main, int templeId, int puzzleId) {
+    public PlayScene(int templeId, int puzzleId) {
         super();
-        this.main = main;
         this.puzzleId = puzzleId;
         this.templeId = templeId;
         lazyLoad();
@@ -716,7 +713,7 @@ public class PlayScene extends GameScene {
                             if (numSolvedPuzzles == TempleScene.TEMPLE_REQUIRE[i]) {
                                 notifyStatus = "4";
                                 if (i != TempleScene.TEMPLE_CYLOP)
-                                    main.openTemple(i);
+                                    Main.getInstance().openTemple(i);
                                 break;
                             }
                         }
@@ -1132,7 +1129,7 @@ public class PlayScene extends GameScene {
     private void confirmCommand() {
         switch (activeCommand) {
             case COMMAND_BACK:
-                main.gotoTemple(templeId, true);
+                Main.getInstance().gotoTemple(templeId, true);
                 break;
                 
             case COMMAND_RESET:
@@ -1157,7 +1154,7 @@ public class PlayScene extends GameScene {
 //#             main.gotoTemple(templeId, true);
 //#elif ScreenWidth == 320
         if (curtainTimeline >= 116 && x > 116 && x < 204 && y > 220)
-            main.gotoTemple(templeId, true);
+            Main.getInstance().gotoTemple(templeId, true);
 //#endif
         
         if (isSliding || curtainTimeline >= 0 || hint != null)

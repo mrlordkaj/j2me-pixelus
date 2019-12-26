@@ -52,11 +52,8 @@ public class MenuScene extends GameScene implements CommandListener {
     private String welcomeText;
 //    private Vector ads;
     
-    private final Main parent;
-    
-    public MenuScene(Main parent) {
+    public MenuScene() {
         super();
-        this.parent = parent;
         load();
         play(40);
     }
@@ -82,8 +79,8 @@ public class MenuScene extends GameScene implements CommandListener {
         };
 //#endif
         // welcome string
-        welcomeText = !parent.playerName.equals("") ?
-                "Welcome back, " + parent.playerName + "!" :
+        welcomeText = !Main.getInstance().playerName.equals("") ?
+                "Welcome back, " + Main.getInstance().playerName + "!" :
                 "Hey mortal! Who are you?";
         isLoading = false;
     }
@@ -198,7 +195,7 @@ public class MenuScene extends GameScene implements CommandListener {
                         new TextBox("Enter your name:", tempName, 14, 0);
                 txtPlayerName.addCommand(new Command("OK", Command.OK, 1));
                 txtPlayerName.setCommandListener(this);
-                Display.getDisplay(parent).setCurrent(txtPlayerName);
+                Display.getDisplay(Main.getInstance()).setCurrent(txtPlayerName);
             }
         }
         else if (messageDialogImage != null) {
@@ -219,13 +216,13 @@ public class MenuScene extends GameScene implements CommandListener {
             // excute command
             switch (activeCommand) {
                 case COMMAND_PLAY:
-                    if (parent.playerName.equals("")) {
+                    if (Main.getInstance().playerName.equals("")) {
                         confirmDialogImage = GameHelper.confirmDialog(new String[] {
                             "Enter your name:"
                         });
                     }
                     else {
-                        parent.gotoIslandMap();
+                        Main.getInstance().gotoIslandMap();
                     }
                     break;
 
@@ -237,7 +234,7 @@ public class MenuScene extends GameScene implements CommandListener {
                     break;
 
                 case COMMAND_ABOUT:
-                    parent.gotoHelp();
+                    Main.getInstance().gotoHelp();
                     break;
 
                 case COMMAND_QUIT:
@@ -261,7 +258,7 @@ public class MenuScene extends GameScene implements CommandListener {
 //#elif ScreenWidth == 320
                 // rate me
                 if (x > 10 && x < 80 && y > 150 && y < 214)
-                    parent.platformRequest("http://store.ovi.mobi/content/375376/comments/add");
+                    Main.getInstance().platformRequest("http://store.ovi.mobi/content/375376/comments/add");
 //#endif
             }
             catch (ConnectionNotFoundException ex) { }
@@ -293,11 +290,11 @@ public class MenuScene extends GameScene implements CommandListener {
         switch (activeCommand) {
             case COMMAND_PLAY:
                 createPlayerProfile();
-                parent.gotoIslandMap();
+                Main.getInstance().gotoIslandMap();
                 break;
                 
             case COMMAND_QUIT:
-                parent.notifyDestroyed();
+                Main.getInstance().notifyDestroyed();
                 break;
         }
         activeCommand = COMMAND_NONE;
@@ -318,12 +315,12 @@ public class MenuScene extends GameScene implements CommandListener {
             if (txtPlayerName.getString().length() > 2 && txtPlayerName.getString().length() < 15)
                 tempName = txtPlayerName.getString();
             txtPlayerName = null;
-            Display.getDisplay(parent).setCurrent(this);
+            Display.getDisplay(Main.getInstance()).setCurrent(this);
         }
     }
     
     private void createPlayerProfile() {
-        parent.playerName = tempName;
+        Main.getInstance().playerName = tempName;
         try {
             RecordStore.deleteRecordStore(Main.RMS_USER);
         }
@@ -335,7 +332,7 @@ public class MenuScene extends GameScene implements CommandListener {
                 data = "0#0#3#0".getBytes();
                 rs.addRecord(data, 0, data.length);
             }
-            data = parent.playerName.getBytes(); // line 202 for player name
+            data = Main.getInstance().playerName.getBytes(); // line 202 for player name
             rs.addRecord(data, 0, data.length);
             data = "1".getBytes(); // line 203 for number of opened temples
             rs.addRecord(data, 0, data.length);

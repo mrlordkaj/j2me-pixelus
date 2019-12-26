@@ -73,11 +73,8 @@ class IslandScene extends GameScene implements StoryPlayer {
     private Sprite starSprite;
     private Story story;
     
-    private final Main main;
-    
-    public IslandScene(Main main) {
+    public IslandScene() {
         super();
-        this.main = main;
         lazyLoad();
         play(100);
     }
@@ -245,7 +242,7 @@ class IslandScene extends GameScene implements StoryPlayer {
             story.pointerPressed(x, y);
         } else {
             if (x > 0 && x < 80 && y > 0 && y < 60) {
-                main.gotoMainMenu();
+                Main.getInstance().gotoMainMenu();
                 return;
             }
             
@@ -260,7 +257,7 @@ class IslandScene extends GameScene implements StoryPlayer {
                     } catch (RecordStoreException ex) {}
                 }
                 // switch to temple screen
-                main.gotoTemple(selectedTemple, false);
+                Main.getInstance().gotoTemple(selectedTemple, false);
                 return;
             }
 
@@ -290,5 +287,5 @@ class IslandScene extends GameScene implements StoryPlayer {
         story = null;
     }
     
-    public String getPlayerName() { return main.playerName; }
+    public String getPlayerName() { return Main.getInstance().playerName; }
 }

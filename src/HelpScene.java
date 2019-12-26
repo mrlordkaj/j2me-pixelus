@@ -69,11 +69,9 @@ class HelpScene extends GameScene {
         "Support: mrlordkaj@gmail.com"
     };
     private int marginTop = Main.SCREEN_HEIGHT + 20;
-    private final Main parent;
     
-    HelpScene(Main parent) {
+    HelpScene() {
         super();
-        this.parent = parent;
         load();
         play(80);
     }
@@ -119,7 +117,7 @@ class HelpScene extends GameScene {
     
     protected void pointerPressed(int x, int y) {
         if (x > 0 && x < 80 && y > 0 && y < 60) {
-            parent.gotoMainMenu();
+            Main.getInstance().gotoMainMenu();
         } else {
             touching = true;
         }

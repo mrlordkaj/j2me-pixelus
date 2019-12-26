@@ -56,6 +56,16 @@ public class Main extends MIDlet {
 //    private Timer timer;
     private GameScene child;
     
+    private static Main instance;
+    
+    public static Main getInstance() {
+        return instance;
+    }
+    
+    public Main() {
+        instance = this;
+    }
+    
     protected void startApp() {
         // change device orientation to landspace
         try {
@@ -87,7 +97,7 @@ public class Main extends MIDlet {
             rs.closeRecordStore();
         } catch (RecordStoreException ex) { }
         // set splash scene as start point
-        child = new SplashScene(this);
+        child = new SplashScene();
         Display.getDisplay(this).setCurrent(child);
         
 //        // runs gc each 0.5 secs
@@ -121,34 +131,34 @@ public class Main extends MIDlet {
     
     public void gotoMainMenu() {
         child.destroy();
-        child = new MenuScene(this);
+        child = new MenuScene();
         Display.getDisplay(this).setCurrent(child);
     }
     
     public void gotoIslandMap() {
         child.destroy();
-        child = new IslandScene(this);
+        child = new IslandScene();
         Display.getDisplay(this).setCurrent(child);
     }
     
     public void gotoHelp() {
         child.destroy();
-        child = new HelpScene(this);
+        child = new HelpScene();
         Display.getDisplay(this).setCurrent(child);
     }
     
     public void gotoTemple(int templeId, boolean isMarginTop) {
         child.destroy();
         child = isMarginTop ?
-                new TempleScene(this, templeId, templeMarginTop) :
-                new TempleScene(this, templeId);
+                new TempleScene(templeId, templeMarginTop) :
+                new TempleScene(templeId);
         Display.getDisplay(this).setCurrent(child);
     }
     
     public void gotoPlay(int puzzleId, int templeId, int templeMarginTop) {
         this.templeMarginTop = templeMarginTop;
         child.destroy();
-        child = new PlayScene(this, templeId, puzzleId);
+        child = new PlayScene(templeId, puzzleId);
         Display.getDisplay(this).setCurrent(child);
     }
     

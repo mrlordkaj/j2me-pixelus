@@ -24,7 +24,7 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
-import util.MathHelper;
+import util.StringHelper;
 
 /**
  * @author Thinh Pham
@@ -79,7 +79,7 @@ public class Main extends MIDlet {
                 rs.closeRecordStore();
                 RecordStore.deleteRecordStore(RMS_SETTING);
                 rs = RecordStore.openRecordStore(RMS_SETTING, true);
-                byte[] data = MathHelper.randomDeviceId();
+                byte[] data = StringHelper.randomDeviceId();
                 rs.addRecord(data, 0, data.length); // line 1: deviceid
                 data = "0".getBytes();
                 rs.addRecord(data, 0, data.length); // line 2: ads click time

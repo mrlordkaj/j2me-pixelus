@@ -18,7 +18,7 @@
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
-import util.ImageHelper;
+import util.FileHelper;
 
 /**
  *
@@ -66,8 +66,8 @@ public class TempleDone extends StoryPage {
                 "THE NEXT TEMPLE!"
             };
         }
-        backgroundImage = ImageHelper.loadImage("/images/happyendingbg.png");
-        frontgroundImage = ImageHelper.loadImage("/images/happyendingfg.png");
+        backgroundImage = FileHelper.loadImage("/images/happyendingbg.png");
+        frontgroundImage = FileHelper.loadImage("/images/happyendingfg.png");
     }
     
 //#if ScreenWidth == 400
@@ -121,7 +121,7 @@ public class TempleDone extends StoryPage {
                 if (textY == TEMPLE_TEXT_TOP)
                     parent.closeStory();
             } else {
-                backgroundImage = ImageHelper.loadImage("/images/gamedone.png");
+                backgroundImage = FileHelper.loadImage("/images/gamedone.png");
                 clickToReturn = true;
             }
         }

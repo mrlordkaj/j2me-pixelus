@@ -22,9 +22,8 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.Sprite;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
-import util.DataHelper;
+import util.FileHelper;
 import util.ButtonSprite;
-import util.ImageHelper;
 import util.StringHelper;
 
 /**
@@ -133,10 +132,10 @@ public class PlayScene extends GameScene {
         slidingTile = Image.createImage(12, 12);
         slidingTileGraphic = slidingTile.getGraphics();
         
-        tileSprite = new Sprite(ImageHelper.loadImage("/images/tile.png"), 12, 12);
+        tileSprite = new Sprite(FileHelper.loadImage("/images/tile.png"), 12, 12);
         viewpotImage = Image.createImage(252, 240);
         viewpotGraphic = viewpotImage.getGraphics();
-        viewpotGraphic.drawImage(ImageHelper.loadImage("/images/playbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
+        viewpotGraphic.drawImage(FileHelper.loadImage("/images/playbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
         Puzzle myPuzzle = Puzzle.getPuzzle(puzzleId);
         puzzleTitle = myPuzzle.getTitle();
         String data = myPuzzle.getData();
@@ -170,9 +169,9 @@ public class PlayScene extends GameScene {
         }
         //if(((Play)parent).getTempleId() != Temple.TEMPLE_CYLOP) ((Play)parent).worldRecord = IOHelper.getFileSize("/data/hints/" + name + ".dat");
         if (templeId != TempleScene.TEMPLE_CYLOP)
-            hintData = DataHelper.readFile("/data/hints/" + name + ".dat");
+            hintData = FileHelper.readFile("/data/hints/" + name + ".dat");
         
-        ImageHelper.loadImage("/data/images/" + name + ".gif")
+        FileHelper.loadImage("/data/images/" + name + ".gif")
                 .getRGB(rgb, 0, 16, 0, 0, 16, 16);
         
         int stackHeight = 12 * totalTile;
@@ -198,15 +197,15 @@ public class PlayScene extends GameScene {
 //#if ScreenWidth == 400
 //#         puzzleCompleteImage = Image.createImage(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
 //#         g = puzzleCompleteImage.getGraphics();
-//#         g.drawImage(ImageHelper.loadImage("/images/puzzlecompleted.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
-//#         GameHelper.drawPuzzleImage(puzzleId, 161, 50, 5, g, ImageHelper.createPixelMask(5), 3);
+//#         g.drawImage(FileHelper.loadImage("/images/puzzlecompleted.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
+//#         GameHelper.drawPuzzleImage(puzzleId, 161, 50, 5, g, GameHelper.createPixelMask(5), 3);
 //#         g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
 //#         g.setColor(0x000000);
 //#         g.drawString(title, Main.SCREEN_WIDTH / 2 + 1, 148 + 1, Graphics.HCENTER | Graphics.BASELINE);
 //#         g.setColor(0xffd800);
 //#         g.drawString(title, Main.SCREEN_WIDTH / 2, 148, Graphics.HCENTER | Graphics.BASELINE);
 //#         
-//#         Image gamepadImage = ImageHelper.loadImage("/images/navbutton.png");
+//#         Image gamepadImage = FileHelper.loadImage("/images/navbutton.png");
 //#         buttons = new ButtonSprite[] {
 //#             new ButtonSprite(gamepadImage, PlayScene.COMMAND_UP, 308, 131, 40, 30),
 //#             new ButtonSprite(gamepadImage, PlayScene.COMMAND_RIGHT, 350, 164, 40, 30),
@@ -217,9 +216,9 @@ public class PlayScene extends GameScene {
 //#         
 //#         sidebarImage = Image.createImage(148, 240);
 //#         g = sidebarImage.getGraphics();
-//#         g.drawImage(ImageHelper.loadImage("/images/sidebarbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
+//#         g.drawImage(FileHelper.loadImage("/images/sidebarbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
 //#         if (templeId == TempleScene.TEMPLE_CYLOP) {
-//#             g.drawImage(ImageHelper.loadImage("/images/tutorialsidebar.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
+//#             g.drawImage(FileHelper.loadImage("/images/tutorialsidebar.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
 //#             g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
 //#             String[] description = Tutorial.getDescription(puzzleId);
 //#             for (int i = 0; i < description.length; i++) {
@@ -233,8 +232,8 @@ public class PlayScene extends GameScene {
 //#elif ScreenWidth == 320
         puzzleCompleteImage = Image.createImage(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
         g = puzzleCompleteImage.getGraphics();
-        g.drawImage(ImageHelper.loadImage("/images/puzzlecompleted.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
-        GameHelper.drawPuzzleImage(puzzleId, 128, 48, 4, g, ImageHelper.createPixelMask(4), 3);
+        g.drawImage(FileHelper.loadImage("/images/puzzlecompleted.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
+        GameHelper.drawPuzzleImage(puzzleId, 128, 48, 4, g, GameHelper.createPixelMask(4), 3);
         g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
         g.setColor(0x000000);
         g.drawString(title, Main.SCREEN_WIDTH / 2 + 1, 130 + 1, Graphics.HCENTER | Graphics.BASELINE);
@@ -244,35 +243,35 @@ public class PlayScene extends GameScene {
         sidebarImage = Image.createImage(68, 240);
         g = sidebarImage.getGraphics();
         if (templeId == TempleScene.TEMPLE_CYLOP) {
-            g.drawImage(ImageHelper.loadImage("/images/tutorialsidebar.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
+            g.drawImage(FileHelper.loadImage("/images/tutorialsidebar.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
             g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
             String[] description = Tutorial.getDescription(puzzleId);
             for (int i = 0; i < description.length; i++) {
                 g.drawString(description[i], 34, 14*i + 18, Graphics.HCENTER | Graphics.BASELINE);
             }
         } else {
-            g.drawImage(ImageHelper.loadImage("/images/sidebarbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
+            g.drawImage(FileHelper.loadImage("/images/sidebarbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
             g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
             g.setColor(0x00ff00);
             g.drawString(Integer.toString(hintData.length()), 32, 94, Graphics.HCENTER | Graphics.BASELINE);
         }
 //#endif
         
-        characterSprite = new Sprite(ImageHelper.loadImage("/images/tilemaster.png"), 20, 26);
+        characterSprite = new Sprite(FileHelper.loadImage("/images/tilemaster.png"), 20, 26);
         characterSprite.setPosition(20, -2);
         
         aimImage = new Image[] {
-            ImageHelper.loadImage("/images/aimup.png"),
-            ImageHelper.loadImage("/images/aimright.png"),
-            ImageHelper.loadImage("/images/aimdown.png"),
-            ImageHelper.loadImage("/images/aimleft.png")
+            FileHelper.loadImage("/images/aimup.png"),
+            FileHelper.loadImage("/images/aimright.png"),
+            FileHelper.loadImage("/images/aimdown.png"),
+            FileHelper.loadImage("/images/aimleft.png")
         };
-        navImage = ImageHelper.loadImage("/images/navigator.png");
-        shruggingSprite = new Sprite(ImageHelper.loadImage("/images/shrugging.png"), 20, 26);
-        celebratingSprite = new Sprite(ImageHelper.loadImage("/images/celebrating.png"), 20, 35);
-        cellMask = ImageHelper.loadImage("/images/cellmask.png");
-        curtainImage = ImageHelper.loadImage("/images/curtain.png");
-        quickMenuImage = ImageHelper.loadImage("/images/quickmenu.png");
+        navImage = FileHelper.loadImage("/images/navigator.png");
+        shruggingSprite = new Sprite(FileHelper.loadImage("/images/shrugging.png"), 20, 26);
+        celebratingSprite = new Sprite(FileHelper.loadImage("/images/celebrating.png"), 20, 35);
+        cellMask = FileHelper.loadImage("/images/cellmask.png");
+        curtainImage = FileHelper.loadImage("/images/curtain.png");
+        quickMenuImage = FileHelper.loadImage("/images/quickmenu.png");
         calcPosible();
         updateCharacterSprite();
         
@@ -787,9 +786,9 @@ public class PlayScene extends GameScene {
 //#                 y += i * 16;
 //#                 g.drawString(desc[i], Main.SCREEN_WIDTH / 2, y, Graphics.HCENTER | Graphics.BASELINE);
 //#             }
-//#             ImageHelper.MEDAL_SPRITE.setFrame(myMedal);
-//#             ImageHelper.MEDAL_SPRITE.setPosition(238, 148);
-//#             ImageHelper.MEDAL_SPRITE.paint(g);
+//#             GameHelper.MEDAL_SPRITE.setFrame(myMedal);
+//#             GameHelper.MEDAL_SPRITE.setPosition(238, 148);
+//#             GameHelper.MEDAL_SPRITE.paint(g);
 //#             g.drawString(secs + " secs", 66, 218, Graphics.HCENTER | Graphics.BASELINE);
 //#elif ScreenWidth == 320
             int y = 160;
@@ -798,9 +797,9 @@ public class PlayScene extends GameScene {
                 g.drawString(desc[i], Main.SCREEN_WIDTH / 2, y, Graphics.HCENTER | Graphics.BASELINE);
             }
             if (myMedal < Puzzle.MEDAL_NONE) {
-                ImageHelper.MEDAL_SPRITE.setFrame(myMedal);
-                ImageHelper.MEDAL_SPRITE.setPosition(190, 128);
-                ImageHelper.MEDAL_SPRITE.paint(g);
+                GameHelper.MEDAL_SPRITE.setFrame(myMedal);
+                GameHelper.MEDAL_SPRITE.setPosition(190, 128);
+                GameHelper.MEDAL_SPRITE.paint(g);
             }
             g.drawString(secs + " secs", 52, 190, Graphics.HCENTER | Graphics.BASELINE);
 //#endif
@@ -1098,7 +1097,7 @@ public class PlayScene extends GameScene {
     }
     
     private void reset() {
-        viewpotGraphic.drawImage(ImageHelper.loadImage("/images/playbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
+        viewpotGraphic.drawImage(FileHelper.loadImage("/images/playbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
         byte tileRemain = 0;
         for (byte i = 0; i < 16; i++) {
             for (byte j = 0; j < 16; j++) {
@@ -1151,7 +1150,7 @@ public class PlayScene extends GameScene {
     protected void pointerReleased(int x, int y) {
 //#if ScreenWidth == 400
 //#         if (curtainTimeline >= 116 && x > 316 && y < 38)
-//#             main.gotoTemple(templeId, true);
+//#             Main.getInstance().gotoTemple(templeId, true);
 //#elif ScreenWidth == 320
         if (curtainTimeline >= 116 && x > 116 && x < 204 && y > 220)
             Main.getInstance().gotoTemple(templeId, true);

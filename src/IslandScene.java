@@ -22,7 +22,7 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.Sprite;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
-import util.ImageHelper;
+import util.FileHelper;
 import util.StringHelper;
 
 /**
@@ -102,29 +102,29 @@ class IslandScene extends GameScene implements StoryPlayer {
         // prepare island image
         islandImage = Image.createImage(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
         Graphics g = islandImage.getGraphics();
-        g.drawImage(ImageHelper.loadImage("/images/islandmap.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
-        ImageHelper.MEDAL_SPRITE.setFrame(0);
+        g.drawImage(FileHelper.loadImage("/images/islandmap.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
+        GameHelper.MEDAL_SPRITE.setFrame(0);
         for (int i = 0; i < totalOpenedTemple; i++) {
             if (templeCompleted[i]) {
                 // draw lighted temple
-                g.drawImage(ImageHelper.loadImage("/images/map" + Story.CHARACTER_NAMES[i].toLowerCase() + "b.png"), IslandScene.TEMPLE_RECTANGLE[i][0], IslandScene.TEMPLE_RECTANGLE[i][1], Graphics.LEFT | Graphics.TOP);
+                g.drawImage(FileHelper.loadImage("/images/map" + Story.CHARACTER_NAMES[i].toLowerCase() + "b.png"), IslandScene.TEMPLE_RECTANGLE[i][0], IslandScene.TEMPLE_RECTANGLE[i][1], Graphics.LEFT | Graphics.TOP);
                 // draw medal to perfect
                 if (templePerfectPuzzle[i] == templeTotalPuzzle[i]) {
                     // if temple is perfect
-                    ImageHelper.MEDAL_SPRITE.setPosition(IslandScene.TEMPLE_RECTANGLE[i][0] + IslandScene.TEMPLE_RECTANGLE[i][2] / 2, IslandScene.TEMPLE_RECTANGLE[i][1] + IslandScene.TEMPLE_RECTANGLE[i][3] - 12);
-                    ImageHelper.MEDAL_SPRITE.paint(g);
+                    GameHelper.MEDAL_SPRITE.setPosition(IslandScene.TEMPLE_RECTANGLE[i][0] + IslandScene.TEMPLE_RECTANGLE[i][2] / 2, IslandScene.TEMPLE_RECTANGLE[i][1] + IslandScene.TEMPLE_RECTANGLE[i][3] - 12);
+                    GameHelper.MEDAL_SPRITE.paint(g);
                 }
             }
             else if (i != 0) {
                 // draw normal temple
-                g.drawImage(ImageHelper.loadImage("/images/map" + Story.CHARACTER_NAMES[i].toLowerCase() + "a.png"), IslandScene.TEMPLE_RECTANGLE[i][0], IslandScene.TEMPLE_RECTANGLE[i][1], Graphics.LEFT | Graphics.TOP);
+                g.drawImage(FileHelper.loadImage("/images/map" + Story.CHARACTER_NAMES[i].toLowerCase() + "a.png"), IslandScene.TEMPLE_RECTANGLE[i][0], IslandScene.TEMPLE_RECTANGLE[i][1], Graphics.LEFT | Graphics.TOP);
             }
             System.gc();
         }
         // prepare other images
-        lightingImage = ImageHelper.loadImage("/images/lighting.png");
-        templeArrowImage = ImageHelper.loadImage("/images/templearrow.png");
-        starSprite = new Sprite(ImageHelper.loadImage("/images/star.png"), 100, 16);
+        lightingImage = FileHelper.loadImage("/images/lighting.png");
+        templeArrowImage = FileHelper.loadImage("/images/templearrow.png");
+        starSprite = new Sprite(FileHelper.loadImage("/images/star.png"), 100, 16);
         starSprite.setPosition(25, 168);
         if (newTemple == 0)
             story = Story.getStory(Story.STORY_CYLOP_CYLOP, this);
@@ -280,12 +280,8 @@ class IslandScene extends GameScene implements StoryPlayer {
         }
     }
     
-    
-    
     public void closeStory() {
         story.dispose();
         story = null;
     }
-    
-    public String getPlayerName() { return Main.getInstance().playerName; }
 }

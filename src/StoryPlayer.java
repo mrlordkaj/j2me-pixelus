@@ -21,5 +21,4 @@
  */
 public interface StoryPlayer {
     void closeStory();
-    String getPlayerName();
 }

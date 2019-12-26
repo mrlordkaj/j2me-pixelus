@@ -19,7 +19,7 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.Sprite;
 import util.Button;
-import util.ImageHelper;
+import util.FileHelper;
 
 /**
  *
@@ -56,8 +56,8 @@ public class Hint {
         this.data = data;
         backgroundImage = Image.createImage(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
         backgroundGraphic = backgroundImage.getGraphics();
-        backgroundGraphic.drawImage(ImageHelper.loadImage("/images/hintbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
-        tileSprite = new Sprite(ImageHelper.loadImage("/images/tile.png"), 12, 12);
+        backgroundGraphic.drawImage(FileHelper.loadImage("/images/hintbackground.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
+        tileSprite = new Sprite(FileHelper.loadImage("/images/tile.png"), 12, 12);
         reset();
         tileImage = Image.createImage(12, 12);
         tileGraphic = tileImage.getGraphics();

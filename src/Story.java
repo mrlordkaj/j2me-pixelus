@@ -19,7 +19,7 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.Sprite;
-import util.ImageHelper;
+import util.FileHelper;
 
 /**
  *
@@ -100,46 +100,40 @@ public class Story extends StoryPage {
     
     public static Story getStory(int id, StoryPlayer parent) {
         Story story = new Story(parent);
-        if (id < 10) {
-            getCylopStory(id, parent, story);
-        }
-        else if (id < 20) {
-            getFloraStory(id, parent, story);
-        }
-        else if (id < 30) {
-            getCupidStory(id, parent, story);
-        }
-        else if (id < 40) {
-            getNeptuneStory(id, parent, story);
-        }
-        else if (id < 50) {
-            getVenusStory(id, parent, story);
-        }
-        else if (id < 60) {
-            getBacchusStory(id, parent, story);
-        }
-        else if (id < 70) {
-            getVulcanStory(id, parent, story);
-        }
-        else if (id < 80) {
-            getDianaStory(id, parent, story);
-        }
-        else if (id < 90) {
-            getProserpinaStory(id, parent, story);
-        }
-        else {
-            getJupiterStory(id, parent, story);
-        }
+        if (id < 10)
+            getCylopStory(id, story);
+        else if (id < 20)
+            getFloraStory(id, story);
+        else if (id < 30)
+            getCupidStory(id, story);
+        else if (id < 40)
+            getNeptuneStory(id, story);
+        else if (id < 50)
+            getVenusStory(id, story);
+        else if (id < 60)
+            getBacchusStory(id, story);
+        else if (id < 70)
+            getVulcanStory(id, story);
+        else if (id < 80)
+            getDianaStory(id, story);
+        else if (id < 90)
+            getProserpinaStory(id, story);
+        else
+            getJupiterStory(id, story);
         return story;
     }
     
-    private static void getCylopStory(int id, StoryPlayer parent, Story story) {
+    private static String getPlayerName() {
+        return Main.getInstance().playerName;
+    }
+    
+    private static void getCylopStory(int id, Story story) {
         switch (id) {
             case STORY_CYLOP_CYLOP:
                 story.character = new int[] { 0, 10, 0 };
                 story.say = new String[][] {
                     {
-                        "Welcome to the island of Pixelus, " + parent.getPlayerName() + "!",
+                        "Welcome to the island of Pixelus, " + getPlayerName() + "!",
                         "The gods of the island are upset because their",
                         "temple floors are broken. Can you help?"
                     },
@@ -160,7 +154,7 @@ public class Story extends StoryPage {
                 story.character = new int[] { 0, 10, 0 };
                 story.say = new String[][] {
                     {
-                        "Well done, " + parent.getPlayerName() + ".",
+                        "Well done, " + getPlayerName() + ".",
                         "I have taught you everything I know!"
                     },
                     {
@@ -178,7 +172,7 @@ public class Story extends StoryPage {
         }
     }
     
-    private static void getFloraStory(int id, StoryPlayer parent, Story story) {
+    private static void getFloraStory(int id, Story story) {
         switch (id) {
             case STORY_FLORA_FLORA:
                 story.character = new int[] { 1, 10, 1 };
@@ -202,7 +196,7 @@ public class Story extends StoryPage {
                 story.character = new int[] { 1, 10, 1 };
                 story.say = new String[][] {
                     {
-                        "Ah, " + parent.getPlayerName() + "! You are progressing well!",
+                        "Ah, " + getPlayerName() + "! You are progressing well!",
                         "I'm recommending you to my best customer,",
                         "Cupid."
                     },
@@ -222,7 +216,7 @@ public class Story extends StoryPage {
                 story.character = new int[] { 1, 10, 1 };
                 story.say = new String[][] {
                     {
-                        "Thank you, " + parent.getPlayerName() + "!",
+                        "Thank you, " + getPlayerName() + "!",
                         "My floors look better than ever!",
                         "How can I repay you now?"
                     },
@@ -263,7 +257,7 @@ public class Story extends StoryPage {
                 story.character = new int[] { 1, 10, 1 };
                 story.say = new String[][] {
                     {
-                        "Oh " + parent.getPlayerName() + "!",
+                        "Oh " + getPlayerName() + "!",
                         "Such pretty mosaics!",
                         "How can I possibly thank you?"
                     },
@@ -302,7 +296,7 @@ public class Story extends StoryPage {
                 story.character = new int[] { 1, 10, 1 };
                 story.say = new String[][] {
                     {
-                        "Oh " + parent.getPlayerName() + "!",
+                        "Oh " + getPlayerName() + "!",
                         "These are such pretty mosaics!",
                         "Where do you get your ideas?"
                     },
@@ -323,7 +317,7 @@ public class Story extends StoryPage {
                 story.character = new int[] { 1, 10, 1 };
                 story.say = new String[][] {
                     {
-                        "Oh " + parent.getPlayerName() + ".",
+                        "Oh " + getPlayerName() + ".",
                         "With these floors,",
                         "you are really spoiling me!"
                     },
@@ -344,7 +338,7 @@ public class Story extends StoryPage {
                 story.character = new int[] { 1, 10, 9 };
                 story.say = new String[][] {
                     {
-                        "Thank you " + parent.getPlayerName() + ".",
+                        "Thank you " + getPlayerName() + ".",
                         "That is exquisite craftsmanship.",
                         "Thanks a bunch!"
                     },
@@ -363,7 +357,7 @@ public class Story extends StoryPage {
         }
     }
     
-    private static void getCupidStory(int id, StoryPlayer parent, Story story) {
+    private static void getCupidStory(int id, Story story) {
         switch (id) {
             case STORY_CUPID_CUPID:
                 story.character = new int[] { 2, 10, 2 };
@@ -427,7 +421,7 @@ public class Story extends StoryPage {
                 story.character = new int[] { 2, 10, 2 };
                 story.say = new String[][] {
                     {
-                        "Oh, lovely mosaics, " + parent.getPlayerName() + "!",
+                        "Oh, lovely mosaics, " + getPlayerName() + "!",
                         "Please let me repay you.",
                         "Is there anyone you fancy?"
                     },
@@ -465,7 +459,7 @@ public class Story extends StoryPage {
                 story.character = new int[] { 2, 10, 2 };
                 story.say = new String[][] {
                     {
-                        "Thank you, thank you, " + parent.getPlayerName() + ".",
+                        "Thank you, thank you, " + getPlayerName() + ".",
                         "These are lovely mosaics."
                     },
                     {
@@ -483,7 +477,7 @@ public class Story extends StoryPage {
                 story.character = new int[] { 2, 10, 2 };
                 story.say = new String[][] {
                     {
-                        parent.getPlayerName() + ". I love you!",
+                        getPlayerName() + ". I love you!",
                         "And I love your mosaics!",
                         "Please let me aid you!"
                     },
@@ -523,7 +517,7 @@ public class Story extends StoryPage {
         
     }
 
-    private static void getNeptuneStory(int id, StoryPlayer parent, Story story) {
+    private static void getNeptuneStory(int id, Story story) {
         switch (id) {
             case STORY_NEPTUNE_NEPTUNE:
                 story.character = new int[] { 3, 10, 3 };
@@ -547,7 +541,7 @@ public class Story extends StoryPage {
                 story.say = new String[][] {
                     {
                         "Arrr!",
-                        "Thank thee " + parent.getPlayerName() + " for these mosaics!",
+                        "Thank thee " + getPlayerName() + " for these mosaics!",
                         "Would that I could reward you amply."
                     },
                     {
@@ -649,7 +643,7 @@ public class Story extends StoryPage {
                 story.say = new String[][] {
                     {
                         "Arrr ha ha harrr!",
-                        "I be mighty impressed, " + parent.getPlayerName() + "!"
+                        "I be mighty impressed, " + getPlayerName() + "!"
                     },
                     {
                         "I'm glad, mighty sea-god.",
@@ -665,13 +659,13 @@ public class Story extends StoryPage {
         }
     }
     
-    private static void getVenusStory(int id, StoryPlayer parent, Story story) {
+    private static void getVenusStory(int id, Story story) {
         switch (id) {
             case STORY_VENUS_VENUS:
                 story.character = new int[] { 4, 10, 4 };
                 story.say = new String[][] {
                     {
-                        "Beautiful, " + parent.getPlayerName() + "!",
+                        "Beautiful, " + getPlayerName() + "!",
                         "A shiny golden temple.",
                         "It's perfect!"
                     },
@@ -689,7 +683,7 @@ public class Story extends StoryPage {
                 story.character = new int[] { 4, 10, 4 };
                 story.say = new String[][] {
                     {
-                        "Oh, " + parent.getPlayerName() + "!",
+                        "Oh, " + getPlayerName() + "!",
                         "You're so good with your hands.",
                         "I grant you a favor!"
                     },
@@ -710,7 +704,7 @@ public class Story extends StoryPage {
                 story.character = new int[] { 4, 10, 4 };
                 story.say = new String[][] {
                     {
-                        "Oh, " + parent.getPlayerName() + "!",
+                        "Oh, " + getPlayerName() + "!",
                         "How do you do such great things...",
                         "with such little hands?"
                     },
@@ -732,7 +726,7 @@ public class Story extends StoryPage {
                 story.say = new String[][] {
                     {
                         "My my. What craftsmanship!",
-                        "I am in your debt, " + parent.getPlayerName() + ".",
+                        "I am in your debt, " + getPlayerName() + ".",
                         "What is your bidding?"
                     },
                     {
@@ -751,7 +745,7 @@ public class Story extends StoryPage {
                 story.character = new int[] { 4, 10, 4 };
                 story.say = new String[][] {
                     {
-                        "Oh, thank you, " + parent.getPlayerName() + "!",
+                        "Oh, thank you, " + getPlayerName() + "!",
                         "You really know how to use your hands!"
                     },
                     {
@@ -770,7 +764,7 @@ public class Story extends StoryPage {
                 story.character = new int[] { 4, 10, 9 };
                 story.say = new String[][] {
                     {
-                        "Oh, wow, " + parent.getPlayerName() + "!",
+                        "Oh, wow, " + getPlayerName() + "!",
                         "Your technique is so good!"
                     },
                     {
@@ -786,7 +780,7 @@ public class Story extends StoryPage {
         }
     }
     
-    private static void getBacchusStory(int id, StoryPlayer parent, Story story) {
+    private static void getBacchusStory(int id, Story story) {
         switch (id) {
             case STORY_BACCHUS_BACCHUS:
                 story.character = new int[] { 5, 10, 5 };
@@ -811,7 +805,7 @@ public class Story extends StoryPage {
                 story.say = new String[][] {
                     {
                         "Oh boy! These are good mosaics!",
-                        "Thanks, " + parent.getPlayerName() + ".",
+                        "Thanks, " + getPlayerName() + ".",
                         "What was it you wanted?"
                     },
                     {
@@ -887,7 +881,7 @@ public class Story extends StoryPage {
         }
     }
     
-    private static void getVulcanStory(int id, StoryPlayer parent, Story story) {
+    private static void getVulcanStory(int id, Story story) {
         switch (id) {
             case STORY_VULCAN_VULCAN:
                 story.character = new int[] { 6, 10, 6 };
@@ -952,7 +946,7 @@ public class Story extends StoryPage {
                 story.character = new int[] { 6, 10, 9 };
                 story.say = new String[][] {
                     {
-                        parent.getPlayerName().toUpperCase() + "!",
+                        getPlayerName().toUpperCase() + "!",
                         "VULCAN IMPRESSED!",
                         "SPEAK!"
                     },
@@ -970,7 +964,7 @@ public class Story extends StoryPage {
         }
     }
     
-    private static void getDianaStory(int id, StoryPlayer parent, Story story) {
+    private static void getDianaStory(int id, Story story) {
         switch(id) {
             case STORY_DIANA_DIANA:
                 story.character = new int[] { 7, 10, 7 };
@@ -984,7 +978,7 @@ public class Story extends StoryPage {
                         "Perfect?"
                     },
                     {
-                        "That's right! Good, " + parent.getPlayerName() + ", good!"
+                        "That's right! Good, " + getPlayerName() + ", good!"
                     }
                 };
                 break;
@@ -993,7 +987,7 @@ public class Story extends StoryPage {
                 story.character = new int[] { 7, 10, 7 };
                 story.say = new String[][] {
                     {
-                        "Come here " + parent.getPlayerName() + "!",
+                        "Come here " + getPlayerName() + "!",
                         "Good mortal! Good!"
                     },
                     {
@@ -1031,7 +1025,7 @@ public class Story extends StoryPage {
         }
     }
     
-    private static void getProserpinaStory(int id, StoryPlayer parent, Story story) {
+    private static void getProserpinaStory(int id, Story story) {
         switch (id) {
             case STORY_PROSERPINA_PROSERPINA:
                 story.character = new int[] { 8, 10, 8 };
@@ -1074,7 +1068,7 @@ public class Story extends StoryPage {
         }
     }
     
-    private static void getJupiterStory(int id, StoryPlayer parent, Story story) {
+    private static void getJupiterStory(int id, Story story) {
         switch (id) {
             case STORY_JUPITER_JUPITER:
                 story.character = new int[] { 9, 10, 9 };
@@ -1120,9 +1114,9 @@ public class Story extends StoryPage {
         this.parent = parent;
         storyGraphic = storyImage.getGraphics();
         storyGraphic.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
-        Image backgroundImage = ImageHelper.loadImage("/images/storybackground.png");
+        Image backgroundImage = FileHelper.loadImage("/images/storybackground.png");
         storyGraphic.drawImage(backgroundImage, 0, 0, Graphics.LEFT | Graphics.TOP);
-        avatar = new Sprite(ImageHelper.loadImage("/images/avatar.png"), 60, 60);
+        avatar = new Sprite(FileHelper.loadImage("/images/avatar.png"), 60, 60);
     }
     
     public void update() {
@@ -1163,14 +1157,12 @@ public class Story extends StoryPage {
         if (currentDialog != 2) {
             currentDialog++;
             int textLeft = 0, textTop = 0;
-            //Image avatar = ImageHelper.loadImage("/images/avatar"+characterName[character[currentDialog]].toLowerCase()+".png");
             avatar.setFrame(character[currentDialog]);
-            Image bubble = ImageHelper.loadImage("/images/storybubble" + currentDialog % 2 + ".png");
+            Image bubble = FileHelper.loadImage("/images/storybubble" + currentDialog % 2 + ".png");
 //#if ScreenWidth == 400
 //#             switch (currentDialog) {
 //#                 case 0:
 //#                     avatar.setPosition(10, 10);
-//#                     //storyGraphics.drawImage(avatar, 10, 10, Graphics.LEFT | Graphics.TOP);
 //#                     storyGraphic.drawImage(bubble, 80, 10, Graphics.LEFT | Graphics.TOP);
 //#                     textLeft = 240;
 //#                     textTop = 26;
@@ -1178,7 +1170,6 @@ public class Story extends StoryPage {
 //# 
 //#                 case 1:
 //#                     avatar.setPosition(330, 80);
-//#                     //storyGraphics.drawImage(avatar, 330, 80, Graphics.LEFT | Graphics.TOP);
 //#                     storyGraphic.drawImage(bubble, 10, 80, Graphics.LEFT | Graphics.TOP);
 //#                     textLeft = 160;
 //#                     textTop = 96;
@@ -1186,13 +1177,11 @@ public class Story extends StoryPage {
 //# 
 //#                 case 2:
 //#                     avatar.setPosition(10, 150);
-//#                     //storyGraphics.drawImage(avatar, 10, 150, Graphics.LEFT | Graphics.TOP);
 //#                     storyGraphic.drawImage(bubble, 80, 150, Graphics.LEFT | Graphics.TOP);
 //#                     textLeft = 240;
 //#                     textTop = 166;
 //#                     break;
 //#             }
-//#             avatar.paint(storyGraphic);
 //#             for (int i = 0; i < say[currentDialog].length; i++) {
 //#                 storyGraphic.drawString(say[currentDialog][i], textLeft, textTop + 16 * i, Graphics.HCENTER | Graphics.BASELINE);
 //#             }
@@ -1200,7 +1189,6 @@ public class Story extends StoryPage {
             switch (currentDialog) {
                 case 0:
                     avatar.setPosition(2, 10);
-                    //storyGraphics.drawImage(avatar, 10, 10, Graphics.LEFT | Graphics.TOP);
                     storyGraphic.drawImage(bubble, 62, 10, Graphics.LEFT | Graphics.TOP);
                     textLeft = 190;
                     textTop = 26;
@@ -1208,7 +1196,6 @@ public class Story extends StoryPage {
 
                 case 1:
                     avatar.setPosition(258, 80);
-                    //storyGraphics.drawImage(avatar, 330, 80, Graphics.LEFT | Graphics.TOP);
                     storyGraphic.drawImage(bubble, 2, 80, Graphics.LEFT | Graphics.TOP);
                     textLeft = 130;
                     textTop = 96;
@@ -1216,17 +1203,16 @@ public class Story extends StoryPage {
 
                 case 2:
                     avatar.setPosition(2, 150);
-                    //storyGraphics.drawImage(avatar, 10, 150, Graphics.LEFT | Graphics.TOP);
                     storyGraphic.drawImage(bubble, 62, 150, Graphics.LEFT | Graphics.TOP);
                     textLeft = 190;
                     textTop = 166;
                     break;
             }
-            avatar.paint(storyGraphic);
             for (int i = 0; i < say[currentDialog].length; i++) {
                 storyGraphic.drawString(say[currentDialog][i], textLeft, textTop + 12 * i, Graphics.HCENTER | Graphics.BASELINE);
             }
 //#endif
+            avatar.paint(storyGraphic);
         }
     }
 }

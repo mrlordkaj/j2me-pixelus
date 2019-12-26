@@ -31,7 +31,7 @@ public class ButtonSprite extends Button {
     public boolean active;
     
     public ButtonSprite(String imagePath, byte cmd, int x, int y, int width, int height) {
-        this(ImageHelper.loadImage(imagePath), cmd, x, y, width, height);
+        this(FileHelper.loadImage(imagePath), cmd, x, y, width, height);
     }
     
     public ButtonSprite(Image img, byte cmd, int x, int y, int width, int height) {

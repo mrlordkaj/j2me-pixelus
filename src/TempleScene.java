@@ -22,7 +22,7 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 import util.Button;
-import util.ImageHelper;
+import util.FileHelper;
 import util.StringHelper;
 
 /**
@@ -174,8 +174,8 @@ public class TempleScene extends GameScene implements StoryPlayer {
                 break;
         }
         
-        Image lockImage = ImageHelper.loadImage("/images/lockpuzzleoverlay.png");
-        Image pixelMask = ImageHelper.createPixelMask(IMAGE_PIXEL_SIZE);
+        Image lockImage = FileHelper.loadImage("/images/lockpuzzleoverlay.png");
+        Image pixelMask = GameHelper.createPixelMask(IMAGE_PIXEL_SIZE);
         
         // draw puzzle list
         int numPuzzle = Puzzle.PUZZLE_FIRSTID[templeId + 1] - Puzzle.PUZZLE_FIRSTID[templeId];
@@ -218,9 +218,9 @@ public class TempleScene extends GameScene implements StoryPlayer {
             }
         }
         // remaining temples
-        backgroundImage = ImageHelper.loadImage("/images/temple" + Story.CHARACTER_NAMES[templeId].toLowerCase() + ".png");
-        buttonImage = ImageHelper.loadImage("/images/buttongold.png");
-        scrollerImage = ImageHelper.loadImage("/images/scroller.png");
+        backgroundImage = FileHelper.loadImage("/images/temple" + Story.CHARACTER_NAMES[templeId].toLowerCase() + ".png");
+        buttonImage = FileHelper.loadImage("/images/buttongold.png");
+        scrollerImage = FileHelper.loadImage("/images/scroller.png");
         // change framerate
         play(40);
     }
@@ -391,7 +391,7 @@ public class TempleScene extends GameScene implements StoryPlayer {
 //#                     //parent.openTemple(TEMPLE_FLORA);
 //#                     openStory(Story.STORY_CYLOP_FLORA);
 //#                 } else {
-//#                     main.gotoIslandMap();
+//#                     Main.getInstance().gotoIslandMap();
 //#                 }
 //#             } else if (x > 210 && x < 276 && y > 154 && y < 182) {
 //#                 // no
@@ -450,7 +450,7 @@ public class TempleScene extends GameScene implements StoryPlayer {
 //#             selectedPuzzleImage = Image.createImage(64, 64);
 //#             Graphics g = selectedPuzzleImage.getGraphics();
 //#             int _medal = (templeId == TEMPLE_CYLOP) ? Puzzle.MEDAL_NONE : this.medal[activePuzzle - Puzzle.PUZZLE_FIRSTID[templeId]];
-//#             GameHelper.drawPuzzleCover(activePuzzle, 0, 0, IMAGE_PIXEL_SIZE, g, ImageHelper.createPixelMask(4), _medal);
+//#             GameHelper.drawPuzzleCover(activePuzzle, 0, 0, IMAGE_PIXEL_SIZE, g, GameHelper.createPixelMask(4), _medal);
 //#             g.setColor(0xffffffff);
 //#             g.drawRect(0, 0, 63, 63);
 //#             g.drawRect(1, 1, 61, 61);
@@ -458,7 +458,7 @@ public class TempleScene extends GameScene implements StoryPlayer {
             selectedPuzzleImage = Image.createImage(48, 48);
             Graphics g = selectedPuzzleImage.getGraphics();
             int _medal = (templeId == TEMPLE_CYLOP) ? Puzzle.MEDAL_NONE : this.medal[activePuzzle - Puzzle.PUZZLE_FIRSTID[templeId]];
-            GameHelper.drawPuzzleCover(activePuzzle, 0, 0, IMAGE_PIXEL_SIZE, g, ImageHelper.createPixelMask(3), _medal);
+            GameHelper.drawPuzzleCover(activePuzzle, 0, 0, IMAGE_PIXEL_SIZE, g, GameHelper.createPixelMask(3), _medal);
             g.setColor(0xffffffff);
             g.drawRect(0, 0, 47, 47);
             g.drawRect(1, 1, 45, 45);
@@ -467,8 +467,6 @@ public class TempleScene extends GameScene implements StoryPlayer {
             selectedPuzzleImage = null;
         }
     }
-    
-    public String getPlayerName() { return Main.getInstance().playerName; }
     
     private void openStory(int storyId) {
         story = Story.getStory(storyId, this);

@@ -15,8 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import util.DataHelper;
-
 /**
  *
  * @author Thinh Pham
@@ -34,7 +32,7 @@ public class Puzzle {
     private final String data;
     
     public static Puzzle getPuzzle(int id) {
-        String[] puzzleData = DataHelper.readPuzzleData(id);
+        String[] puzzleData = GameHelper.readPuzzleData(id);
         return new Puzzle(puzzleData[0], puzzleData[1], puzzleData[2]);
     }
     

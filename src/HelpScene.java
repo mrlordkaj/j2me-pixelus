@@ -19,7 +19,7 @@ import util.GameScene;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
-import util.ImageHelper;
+import util.FileHelper;
 
 /**
  *
@@ -77,8 +77,8 @@ class HelpScene extends GameScene {
     }
     
     protected final void load() {
-        backgroundImage = ImageHelper.loadImage("/images/storybackground.png");
-        titleImage = ImageHelper.loadImage("/images/helptitle.png");
+        backgroundImage = FileHelper.loadImage("/images/storybackground.png");
+        titleImage = FileHelper.loadImage("/images/helptitle.png");
         isLoading = false;
     }
     

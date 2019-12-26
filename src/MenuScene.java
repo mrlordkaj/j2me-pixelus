@@ -29,7 +29,7 @@ import javax.microedition.lcdui.TextBox;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 import util.ButtonSprite;
-import util.ImageHelper;
+import util.FileHelper;
 
 /**
  *
@@ -59,7 +59,7 @@ public class MenuScene extends GameScene implements CommandListener {
     }
     
     protected final void load() {
-        backgroundImage = ImageHelper.loadImage("/images/mainmenubackground.png");
+        backgroundImage = FileHelper.loadImage("/images/mainmenubackground.png");
 //        if(parent.displayAds) {
 //            ads = IADView.getBannerAdData(parent, Main.NAX_CODE);
 //        }
@@ -251,10 +251,10 @@ public class MenuScene extends GameScene implements CommandListener {
 //#if ScreenWidth == 400
 //#                 // rate me
 //#                 if (x > 14 && x < 126 && y > 136 && y < 168)
-//#                     parent.platformRequest("http://store.ovi.mobi/content/375376/comments/add");
+//#                     Main.getInstance().platformRequest("http://store.ovi.mobi/content/375376/comments/add");
 //#                 // facebook
 //#                 else if (x > 14 && x < 126 && y > 200 && y < 232)
-//#                     parent.platformRequest("http://m.facebook.com/openitvn");
+//#                     Main.getInstance().platformRequest("http://m.facebook.com/openitvn");
 //#elif ScreenWidth == 320
                 // rate me
                 if (x > 10 && x < 80 && y > 150 && y < 214)

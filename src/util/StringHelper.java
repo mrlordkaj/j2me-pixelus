@@ -16,11 +16,14 @@
  */
 package util;
 
+import java.util.Random;
+
 /**
  *
  * @author Thinh Pham
  */
-public class StringHelper {
+public abstract class StringHelper {
+    
     public static String[] split(String sb, String splitter) {
         String[] strs = new String[sb.length()];
         int splitLength = splitter.length();
@@ -46,5 +49,16 @@ public class StringHelper {
         String[] rs = new String[count];
         System.arraycopy(strs, 0, rs, 0, count);
         return rs;
+    }
+    
+    public static byte[] randomDeviceId() {
+        char[] chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
+        StringBuffer sb = new StringBuffer(32);
+        Random rnd = new Random();
+        for (int i = 0; i < 32; i++) {
+            char c = chars[rnd.nextInt(chars.length)];
+            sb.append(c);
+        }
+        return sb.toString().getBytes();
     }
 }

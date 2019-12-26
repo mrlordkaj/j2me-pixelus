@@ -19,7 +19,7 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.Sprite;
-import util.ImageHelper;
+import util.FileHelper;
 
 /**
  *
@@ -34,7 +34,7 @@ public class Tutorial {
     public Tutorial(int[] step, String[][] description) {
         this.step = step;
         this.description = description;
-        ballonSprite = new Sprite(ImageHelper.loadImage("/images/ballon.png"), 127, 110);
+        ballonSprite = new Sprite(FileHelper.loadImage("/images/ballon.png"), 127, 110);
     }
     
     public Image getBallon(int nStep) {

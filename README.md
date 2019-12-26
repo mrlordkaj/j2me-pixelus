@@ -1,4 +1,4 @@
-Pixelus (J2ME Source Code)
+Pixelus Mobile (J2ME Source Code)
 Copyright 2012 Openitvn Games
 
 Programmed by Thinh Pham

@@ -83,7 +83,7 @@ public abstract class GameScene extends GameCanvas implements Runnable {
     protected boolean repaintLoading(Graphics g) {
         if (isLoading) {
             if (loadingSprite == null) {
-                loadingSprite = new Sprite(ImageHelper.loadImage("/images/juggling.png"), 20, 26);
+                loadingSprite = new Sprite(FileHelper.loadImage("/images/juggling.png"), 20, 26);
                 loadingSprite.setPosition(SCREEN_WIDTH / 2 - 46, SCREEN_HEIGHT / 2);
             }
             g.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);

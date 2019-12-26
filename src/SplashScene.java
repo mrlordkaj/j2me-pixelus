@@ -22,7 +22,7 @@ import javax.microedition.io.ConnectionNotFoundException;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
-import util.ImageHelper;
+import util.FileHelper;
 
 /**
  *
@@ -141,7 +141,7 @@ public class SplashScene extends GameScene {
         currentScreen++;
         switch (currentScreen) {
             case SCREEN_OPENITVN:
-                backgroundTexture = ImageHelper.loadImage("/images/logoopenitvn.png");
+                backgroundTexture = FileHelper.loadImage("/images/logoopenitvn.png");
                 break;
                 
             case SCREEN_SPONSOR:
@@ -160,7 +160,7 @@ public class SplashScene extends GameScene {
                 
             case SCREEN_SPLASH:
                 ads = null;
-                backgroundTexture = ImageHelper.loadImage("/images/splash.png");
+                backgroundTexture = FileHelper.loadImage("/images/splash.png");
                 play(500);
                 break;
         }

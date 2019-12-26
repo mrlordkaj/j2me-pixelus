@@ -18,12 +18,13 @@ package util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import javax.microedition.lcdui.Image;
 
 /**
  *
  * @author Thinh Pham
  */
-public abstract class DataHelper {
+public abstract class FileHelper {
     
     public static String readFile(String path) throws RuntimeException {
         try {
@@ -39,34 +40,10 @@ public abstract class DataHelper {
         }
     }
     
-    public static String[] readPuzzleData(int puzzleId) throws RuntimeException {
+    public static Image loadImage(String path) throws RuntimeException {
         try {
-            String[] rs = new String[3];
-            InputStream is = InputStream.class.getResourceAsStream("/data/puzzles.dat");
-            StringBuffer sb = new StringBuffer();
-            int c;
-            int curLine = 1;
-            while (((c = is.read()) != -1)) {
-                if (c == '\n') {
-                    ++curLine;
-                    c = is.read();
-                }
-                if (curLine == puzzleId) {
-                    if (c == '#') {
-                        rs[0] = sb.toString();
-                        sb = new StringBuffer();
-                    } else {
-                        sb.append((char) c);
-                    }
-                } else if(curLine > puzzleId) {
-                    rs[1] = sb.toString();
-                    rs[2] = readFile("/data/" + rs[0] + ".dat");
-                    return rs;
-                }
-            }
-            rs[1] = sb.toString();
-            rs[2] = readFile("/data/" + rs[0] + ".dat");
-            return rs;
+            InputStream is = Image.class.getResourceAsStream(path);
+            return Image.createImage(is);
         } catch (IOException ex) {
             throw new RuntimeException(ex.getMessage());
         }

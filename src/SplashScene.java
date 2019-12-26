@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import util.GameScene;
 import InneractiveSDK.IADView;
 import java.util.Vector;
 import javax.microedition.io.ConnectionNotFoundException;
@@ -46,20 +47,16 @@ public class SplashScene extends GameScene {
     public SplashScene(Main parent) {
         super();
         this.parent = parent;
-        begin(2000);
+        play(2000);
     }
     
-    void load() {
+    protected void load() {
         
     }
     
-    void unload() {
+    protected void unload() {
         backgroundTexture = null;
         ads = null;
-    }
-    
-    public void setLoadingStatus(boolean status) {
-        isLoading = status;
     }
     
     protected void update(){
@@ -70,14 +67,14 @@ public class SplashScene extends GameScene {
         
         if (waiting > 0) {
             if (--waiting == 0) {
-                framePeriod = 2000;
+                play(2000);
                 nextScreen();
             }
         }
     }
     
     public void paint(Graphics g) {
-        if (isLoading) {
+        if (isLoading()) {
             g.fillRect(0, 0, Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
             if (currentScreen == SCREEN_SPONSOR) {
                 g.fillRect(0, 0, Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
@@ -156,7 +153,7 @@ public class SplashScene extends GameScene {
                     ads = IADView.getBannerAdData(parent, Main.NAX_CODE);
                     if (ads == null) {
                         waiting = 2;
-                        framePeriod = 1000;
+                        play(1000);
                     }
                 }
                 else {
@@ -167,7 +164,7 @@ public class SplashScene extends GameScene {
             case SCREEN_SPLASH:
                 ads = null;
                 backgroundTexture = ImageHelper.loadImage("/images/splash.png");
-                framePeriod = 500;
+                play(500);
                 break;
         }
         isLoading = false;

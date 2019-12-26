@@ -14,30 +14,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package util;
 
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.game.GameCanvas;
 import javax.microedition.lcdui.game.Sprite;
-import util.ImageHelper;
 
 /**
  *
  * @author Thinh Pham
  */
-abstract class GameScene extends GameCanvas implements Runnable {
+public abstract class GameScene extends GameCanvas implements Runnable {
+    
+//#if ScreenWidth == 400
+//#     public static final int SCREEN_WIDTH = 400;
+//#     public static final int SCREEN_HEIGHT = 240;
+//#elif ScreenWidth == 320
+    public static final int SCREEN_WIDTH = 320;
+    public static final int SCREEN_HEIGHT = 240;
+//#endif
     
     private static Sprite loadingSprite;
     
-    abstract void load();
-    abstract void unload();
-    abstract void update();
+    protected abstract void load();
+    protected abstract void unload();
+    protected abstract void update();
     
-    short framePeriod;
-    boolean isLoading = true;
+    private short framePeriod;
+    protected boolean isLoading = true; // TODO: make private
     private boolean isPlaying;
-    final Thread playThread;
+    private final Thread playThread;
     
-    GameScene() {
+    protected GameScene() {
         super(false);
         setFullScreenMode(true);
         playThread = new Thread(this);
@@ -53,7 +61,7 @@ abstract class GameScene extends GameCanvas implements Runnable {
         }
     }
     
-    final void begin(int framePeriod) {
+    public final void play(int framePeriod) {
         this.framePeriod = (short) framePeriod;
         if (!isPlaying) {
             isPlaying = true;
@@ -61,33 +69,33 @@ abstract class GameScene extends GameCanvas implements Runnable {
         }
     }
     
-    final void destroy() {
+    public final void destroy() {
         isPlaying = false;
         isLoading = true;
         playThread.interrupt();
         unload();
     }
     
-    boolean isLoading() {
-        return isLoading;
-    }
-    
-    final void lazyLoad() {
+    public final void lazyLoad() {
         new LazyLoad(this).start();
     }
     
-    boolean isLoading(Graphics g) {
+    protected boolean repaintLoading(Graphics g) {
         if (isLoading) {
             if (loadingSprite == null) {
                 loadingSprite = new Sprite(ImageHelper.loadImage("/images/juggling.png"), 20, 26);
-                loadingSprite.setPosition(Main.SCREEN_WIDTH / 2 - 46, Main.SCREEN_HEIGHT / 2);
+                loadingSprite.setPosition(SCREEN_WIDTH / 2 - 46, SCREEN_HEIGHT / 2);
             }
-            g.fillRect(0, 0, Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
+            g.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
             loadingSprite.nextFrame();
             loadingSprite.paint(g);
             g.setColor(255, 255, 255);
-            g.drawString("loading...", Main.SCREEN_WIDTH / 2 - 16, Main.SCREEN_HEIGHT / 2 + 20, Graphics.LEFT | Graphics.BASELINE);
+            g.drawString("loading...", SCREEN_WIDTH / 2 - 16, SCREEN_HEIGHT / 2 + 20, Graphics.LEFT | Graphics.BASELINE);
         }
+        return isLoading;
+    }
+    
+    public boolean isLoading() {
         return isLoading;
     }
 }

@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import util.GameScene;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
@@ -78,10 +79,10 @@ class IslandScene extends GameScene implements StoryPlayer {
         super();
         this.main = main;
         lazyLoad();
-        begin(100);
+        play(100);
     }
     
-    void load() {
+    protected void load() {
         // load record store
         try {
             RecordStore rs = RecordStore.openRecordStore(Main.RMS_USER, false);
@@ -132,14 +133,14 @@ class IslandScene extends GameScene implements StoryPlayer {
             story = Story.getStory(Story.STORY_CYLOP_CYLOP, this);
     }
     
-    void unload() {
+    protected void unload() {
         islandImage = null;
         lightingImage = null;
         lightingPosition = null;
         templeArrowImage = null;
     }
     
-    void update() {
+    protected void update() {
         if (!isLoading) {
             if (story != null) {
                 story.update();
@@ -158,7 +159,7 @@ class IslandScene extends GameScene implements StoryPlayer {
     }
     
     public void paint(Graphics g) {
-        if (!isLoading(g)) {
+        if (!repaintLoading(g)) {
             if (story != null) {
                 story.paint(g);
             } else {

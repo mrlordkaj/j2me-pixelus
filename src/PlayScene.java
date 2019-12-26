@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import util.GameScene;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
@@ -111,10 +112,10 @@ public class PlayScene extends GameScene {
         this.puzzleId = puzzleId;
         this.templeId = templeId;
         lazyLoad();
-        begin(100);
+        play(100);
     }
     
-    void load() {
+    protected void load() {
         if (templeId != TempleScene.TEMPLE_CYLOP) {
             try {
                 RecordStore rs = RecordStore.openRecordStore(Main.RMS_USER, false);
@@ -201,7 +202,7 @@ public class PlayScene extends GameScene {
 //#         puzzleCompleteImage = Image.createImage(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
 //#         g = puzzleCompleteImage.getGraphics();
 //#         g.drawImage(ImageHelper.loadImage("/images/puzzlecompleted.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
-//#         LazyLoad.drawPuzzleImage(puzzleId, 161, 50, 5, g, ImageHelper.createPixelMask(5), 3);
+//#         GameHelper.drawPuzzleImage(puzzleId, 161, 50, 5, g, ImageHelper.createPixelMask(5), 3);
 //#         g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
 //#         g.setColor(0x000000);
 //#         g.drawString(title, Main.SCREEN_WIDTH / 2 + 1, 148 + 1, Graphics.HCENTER | Graphics.BASELINE);
@@ -236,7 +237,7 @@ public class PlayScene extends GameScene {
         puzzleCompleteImage = Image.createImage(Main.SCREEN_WIDTH, Main.SCREEN_HEIGHT);
         g = puzzleCompleteImage.getGraphics();
         g.drawImage(ImageHelper.loadImage("/images/puzzlecompleted.png"), 0, 0, Graphics.LEFT | Graphics.TOP);
-        LazyLoad.drawPuzzleImage(puzzleId, 128, 48, 4, g, ImageHelper.createPixelMask(4), 3);
+        GameHelper.drawPuzzleImage(puzzleId, 128, 48, 4, g, ImageHelper.createPixelMask(4), 3);
         g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
         g.setColor(0x000000);
         g.drawString(title, Main.SCREEN_WIDTH / 2 + 1, 130 + 1, Graphics.HCENTER | Graphics.BASELINE);
@@ -282,7 +283,7 @@ public class PlayScene extends GameScene {
             prepareTutorialStep();
     }
     
-    void unload() {
+    protected void unload() {
         viewpotImage = null;
         sidebarImage = null;
         navImage = null;
@@ -352,7 +353,7 @@ public class PlayScene extends GameScene {
             return;
         }
         
-        if (!isLoading(g)) {
+        if (!repaintLoading(g)) {
             g.drawImage(viewpotImage, 0, 0, Graphics.TOP | Graphics.LEFT);
             g.drawImage(stackImage, 240, tileStackY, Graphics.TOP | Graphics.LEFT);
             g.drawImage(sidebarImage, 252, 0, Graphics.TOP | Graphics.LEFT);
@@ -480,7 +481,7 @@ public class PlayScene extends GameScene {
 //#                 else {
 //#                     quickMenu = true;
 //#                     quickMenuOpening = false;
-//#                     framePeriod = 100;
+//#                     play(100);
 //#                     autoCloseMenu = 60;
 //#                 }
 //#                 return;
@@ -490,7 +491,7 @@ public class PlayScene extends GameScene {
 //#                 else {
 //#                     quickMenu = false;
 //#                     quickMenuClosing = false;
-//#                     framePeriod = 100;
+//#                     play(100);
 //#                 }
 //#                 return;
 //#             }
@@ -498,7 +499,7 @@ public class PlayScene extends GameScene {
 //#             if (quickMenu && autoCloseMenu > 0) {
 //#                 if (--autoCloseMenu == 0) {
 //#                     quickMenuClosing = true;
-//#                     framePeriod = 40;
+//#                     play(40);
 //#                 }
 //#             }
 //#endif
@@ -563,7 +564,7 @@ public class PlayScene extends GameScene {
                 slidingDone = false;
                 throwingTimeline = -1;
                 stackTimeline = 0;
-                framePeriod = 20;
+                play(20);
             }
         }
     }
@@ -577,7 +578,7 @@ public class PlayScene extends GameScene {
                 if (slidingDone) {
                     slidingDone = false;
                     isSliding = false;
-                    framePeriod = 100;
+                    play(100);
                     if (checkEndGame())
                         return;
                 }
@@ -597,10 +598,10 @@ public class PlayScene extends GameScene {
             if (curtainTimeline < 3) {
                 celebratingSprite.nextFrame();
             } else if (curtainTimeline == 3) {
-                framePeriod = 25;
+                play(25);
             } else if (curtainTimeline < 50) {
                 int j, left, top;
-                for (byte i = 0; i < 16; framePeriod = i++) {
+                for (byte i = 0; i < 16; i++) {
                     j = curtainTimeline - i * 2 - 4;
                     if (j < 0) break;
                     else if (j < 16) {
@@ -612,7 +613,7 @@ public class PlayScene extends GameScene {
                     }
                 }
             } else if (curtainTimeline == 50) {
-                framePeriod = 50;
+                play(50);
             } else if (curtainTimeline > 70 && curtainTimeline < 93) {
                 for (byte i = 0; i < 4; i++) {
                     if (curtainX[i] > i * 100 - 20)
@@ -633,9 +634,9 @@ public class PlayScene extends GameScene {
                 }
             } else {
                 if (curtainType == CURTAIN_FINISH)
-                    framePeriod = 32767;
+                    play(32767);
                 else if(curtainType == CURTAIN_HINT)
-                    framePeriod = 20;
+                    play(20);
             }
         }
     }
@@ -906,7 +907,7 @@ public class PlayScene extends GameScene {
         slidingDone = true;
         if (stackTimeline == -1) {
             isSliding = false;
-            framePeriod = 100;
+            play(100);
         }
         if (cell[cursor[0]][cursor[1]] <= 2) {
             // push in
@@ -965,7 +966,7 @@ public class PlayScene extends GameScene {
             isSliding = true;
             slidingDone = false;
             stackTimeline = 0;
-            framePeriod = 20;
+            play(20);
             // remove undo data
             undoCell.deleteCharAt(dataIndex);
             undoDirection.deleteCharAt(dataIndex);
@@ -1007,19 +1008,18 @@ public class PlayScene extends GameScene {
         
 //#if ScreenWidth == 400
 //#         if (templeId != TempleScene.TEMPLE_CYLOP && !quickMenu && x > 272 && x < 380 && y > 12 && y < 38) {
-//#             framePeriod = 40;
+//#             play(40);
 //#             quickMenuOpening = true;
 //#             return;
-//#         }
-//#         else if (quickMenu && x > 272 && x < 380 && y > 78 && y <104) {
-//#             framePeriod = 40;
+//#         } else if (quickMenu && x > 272 && x < 380 && y > 78 && y <104) {
+//#             play(40);
 //#             quickMenuClosing = true;
 //#             return;
 //#         }
 //#         if (quickMenu && !quickMenuOpening && !quickMenuClosing) {
 //#             if (x > 266 && x < 326 && y > 12 && y < 42) {
 //#                 // Hint button
-//#                 framePeriod = 50;
+//#                 play(50);
 //#                 curtainType = CURTAIN_HINT;
 //#                 curtainTimeline = 71;
 //#                 autoCloseMenu = 60;
@@ -1031,7 +1031,7 @@ public class PlayScene extends GameScene {
 //#                 return;
 //#             } else if (x > 266 && x < 326 && y > 44 && y < 74) {
 //#                 // Back button
-//#                 confirmDialogImage = LazyLoad.confirmDialog(new String[] {
+//#                 confirmDialogImage = GameHelper.confirmDialog(new String[] {
 //#                     "Do you want to come",
 //#                     "back to the temple?",
 //#                     "Your puzzle process",
@@ -1042,7 +1042,7 @@ public class PlayScene extends GameScene {
 //#                 return;
 //#             } else if(x > 328 && x < 388 && y > 44 && y < 74) {
 //#                 // Reset button
-//#                 confirmDialogImage = LazyLoad.confirmDialog(new String[] {
+//#                 confirmDialogImage = GameHelper.confirmDialog(new String[] {
 //#                     "Are you sure you",
 //#                     "want to reset",
 //#                     "this puzzle process?"
@@ -1061,7 +1061,7 @@ public class PlayScene extends GameScene {
         if (templeId != TempleScene.TEMPLE_CYLOP) {
             if (x > 258 && x < 312 && y > 180 && y < 206) {
                 // Hint button
-                framePeriod = 50;
+                play(50);
                 curtainType = CURTAIN_HINT;
                 curtainTimeline = 71;
                 return;
@@ -1073,7 +1073,7 @@ public class PlayScene extends GameScene {
             }
             else if (x > 258 && x < 312 && y > 154 && y < 180) {
                 // Reset button
-                confirmDialogImage = LazyLoad.confirmDialog(new String[] {
+                confirmDialogImage = GameHelper.confirmDialog(new String[] {
                     "Are you sure you",
                     "want to reset",
                     "this puzzle process?"
@@ -1084,7 +1084,7 @@ public class PlayScene extends GameScene {
         }
         if (x > 256 && x < 314 && y > 218 && y < 236) {
             // Back button
-            confirmDialogImage = LazyLoad.confirmDialog(new String[] {
+            confirmDialogImage = GameHelper.confirmDialog(new String[] {
                 "Do you want to come",
                 "back to the temple?",
                 "Your puzzle process",
@@ -1431,6 +1431,6 @@ public class PlayScene extends GameScene {
         curtainType = CURTAIN_NONE;
         hint.dispose();
         hint = null;
-        framePeriod = 100;
+        play(100);
     }
 }

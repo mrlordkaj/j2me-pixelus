@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import util.GameScene;
 import com.nokia.mid.ui.orientation.Orientation;
 import java.util.Calendar;
 //import java.util.Timer;

@@ -1,18 +1,7 @@
 /*
- * Copyright (C) 2012 Thinh Pham
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 import javax.microedition.lcdui.Graphics;
@@ -21,29 +10,14 @@ import util.ImageHelper;
 
 /**
  *
- * @author Thinh Pham
+ * @author Thinh
  */
-class LazyLoad extends Thread {
-    
-    private final GameScene scene;
-    
-    LazyLoad(GameScene scene) {
-        this.scene = scene;
-    }
-    
-    public void run() {
-        try {
-            scene.load();
-            Thread.sleep(1000);
-            System.gc();
-            scene.isLoading = false;
-        } catch (InterruptedException ex) { }
-    }
+public abstract class GameHelper {
     
 //#if ScreenWidth == 400
-//#     private static final int MEDAL_SPRITE_TOP = 40;
+    private static final int MEDAL_SPRITE_TOP = 40;
 //#elif ScreenWidth == 320
-    private static final int MEDAL_SPRITE_TOP = 24;
+//#     private static final int MEDAL_SPRITE_TOP = 24;
 //#endif
     
     static void drawPuzzleCover(int puzzleId, int x, int y, int pixelSize, Graphics g, Image pixelMask, int medal) {

@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import util.GameScene;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
@@ -74,16 +75,16 @@ class HelpScene extends GameScene {
         super();
         this.parent = parent;
         load();
-        begin(80);
+        play(80);
     }
     
-    final void load() {
+    protected final void load() {
         backgroundImage = ImageHelper.loadImage("/images/storybackground.png");
         titleImage = ImageHelper.loadImage("/images/helptitle.png");
         isLoading = false;
     }
     
-    void unload() {
+    protected void unload() {
         backgroundImage = null;
         titleImage = null;
         helpContent = null;
@@ -95,7 +96,7 @@ class HelpScene extends GameScene {
     private static final int MARGIN_TOP_MIN = 70;
 //#endif
     
-    void update() {
+    protected void update() {
         if (!isLoading) {
             if (marginTop > MARGIN_TOP_MIN - helpContent.length * 20) {
                 marginTop -= touching ? 4 : 1;

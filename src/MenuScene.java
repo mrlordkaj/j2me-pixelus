@@ -16,6 +16,7 @@
  */
 
 //import InneractiveSDK.IADView;
+import util.GameScene;
 import javax.microedition.io.ConnectionNotFoundException;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -57,10 +58,10 @@ public class MenuScene extends GameScene implements CommandListener {
         super();
         this.parent = parent;
         load();
-        begin(40);
+        play(40);
     }
     
-    final void load() {
+    protected final void load() {
         backgroundImage = ImageHelper.loadImage("/images/mainmenubackground.png");
 //        if(parent.displayAds) {
 //            ads = IADView.getBannerAdData(parent, Main.NAX_CODE);
@@ -87,7 +88,7 @@ public class MenuScene extends GameScene implements CommandListener {
         isLoading = false;
     }
     
-    void unload() {
+    protected void unload() {
         backgroundImage = null;
         confirmDialogImage = null;
         menuItems = null;
@@ -219,7 +220,7 @@ public class MenuScene extends GameScene implements CommandListener {
             switch (activeCommand) {
                 case COMMAND_PLAY:
                     if (parent.playerName.equals("")) {
-                        confirmDialogImage = LazyLoad.confirmDialog(new String[] {
+                        confirmDialogImage = GameHelper.confirmDialog(new String[] {
                             "Enter your name:"
                         });
                     }
@@ -229,7 +230,7 @@ public class MenuScene extends GameScene implements CommandListener {
                     break;
 
                 case COMMAND_EXTRAS:
-                    messageDialogImage = LazyLoad.messageDialog(new String[] {
+                    messageDialogImage = GameHelper.messageDialog(new String[] {
                         "This feature is not",
                         "available by now!"
                     });
@@ -240,7 +241,7 @@ public class MenuScene extends GameScene implements CommandListener {
                     break;
 
                 case COMMAND_QUIT:
-                    confirmDialogImage = LazyLoad.confirmDialog(new String[] {
+                    confirmDialogImage = GameHelper.confirmDialog(new String[] {
                         "Are you sure you",
                         "want to quit the",
                         "Pixelus Mobile?"

@@ -16,10 +16,6 @@
  */
 
 import util.GameScene;
-import com.nokia.mid.ui.orientation.Orientation;
-import java.util.Calendar;
-//import java.util.Timer;
-//import java.util.TimerTask;
 import javax.microedition.lcdui.Display;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.rms.RecordStore;
@@ -29,7 +25,7 @@ import util.StringHelper;
 /**
  * @author Thinh Pham
  */
-public class Main extends MIDlet {
+public final class Main extends MIDlet {
     
 //#if ScreenWidth == 400
 //#     public static final int SCREEN_WIDTH = 400;
@@ -41,7 +37,6 @@ public class Main extends MIDlet {
     
     public static final String RMS_SETTING = "setting";
     public static final int RMS_SETTING_DEVICEID = 1;
-    public static final int RMS_SETTING_ADSTIME = 2;
     public static final String RMS_USER = "user";
     public static final int RMS_USER_NAME = 202;
     public static final int RMS_USER_OPENEDTEMPLE = 203;
@@ -52,7 +47,6 @@ public class Main extends MIDlet {
     
     private int templeMarginTop;
     public String playerName = "";
-    public boolean displayAds = true;
 //    private Timer timer;
     private GameScene child;
     
@@ -63,15 +57,10 @@ public class Main extends MIDlet {
     }
     
     public Main() {
-        instance = this;
+        instance = Main.this;
     }
     
     protected void startApp() {
-        // change device orientation to landspace
-        try {
-            Class.forName("com.nokia.mid.ui.orientation.Orientation");
-            Orientation.setAppOrientation(Orientation.ORIENTATION_LANDSCAPE);
-        }  catch (ClassNotFoundException ex) { }
         // generate default setting if needed, then check time after ads clicked
         try {
             RecordStore rs = RecordStore.openRecordStore(RMS_SETTING, true);
@@ -83,10 +72,6 @@ public class Main extends MIDlet {
                 rs.addRecord(data, 0, data.length); // line 1: deviceid
                 data = "0".getBytes();
                 rs.addRecord(data, 0, data.length); // line 2: ads click time
-            } else {
-                long adsTime = Long.parseLong(new String(rs.getRecord(RMS_SETTING_ADSTIME)));
-                long currentTime = Calendar.getInstance().getTime().getTime();
-                displayAds = (currentTime - adsTime > 86400000);
             }
             rs.closeRecordStore();
         } catch (RecordStoreException ex) { }
@@ -99,14 +84,6 @@ public class Main extends MIDlet {
         // set splash scene as start point
         child = new SplashScene();
         Display.getDisplay(this).setCurrent(child);
-        
-//        // runs gc each 0.5 secs
-//        timer = new Timer();
-//        timer.schedule(new TimerTask() {
-//            public void run() {
-//                System.gc();
-//            }
-//        }, 0, 500);
     }
     
     protected void pauseApp() {
@@ -115,18 +92,6 @@ public class Main extends MIDlet {
     
     protected void destroyApp(boolean unconditional) {
     
-    }
-    
-    public void bannerPressed() {
-        displayAds = false;
-        long curTime = Calendar.getInstance().getTime().getTime();
-        try {
-            RecordStore rs = RecordStore.openRecordStore(Main.RMS_SETTING, false);
-            byte[] data = Long.toString(curTime).getBytes();
-            rs.setRecord(RMS_SETTING_ADSTIME, data, 0, data.length); // line 2: ads click time
-            rs.closeRecordStore();
-        }
-        catch (RecordStoreException ex) { }
     }
     
     public void gotoMainMenu() {

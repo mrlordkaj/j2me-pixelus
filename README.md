@@ -1,19 +1,8 @@
 Pixelus Mobile (J2ME Source Code)
-Copyright 2012 Openitvn Games
-
-Programmed by Thinh Pham
+Developed by Thinh Pham
 
 This project was built on:
-- Netbeans IDE 8.2
+- Netbeans IDE 7.4
 - JDK 7 Update 17
 - Nokia SDK 2.0
 - Nokia Asha SDK 1.2
-
-Optional 3rd-party libraries:
-- Inneractive J2ME Ad SDK 1.0.9
-
-For more information, feel free to contact me:
-Email: mrlordkaj@gmail.com
-Yahoo: mrlordkaj
-Skype: mrlordkaj
-Facebook: https://www.facebook.com/lordkaj
